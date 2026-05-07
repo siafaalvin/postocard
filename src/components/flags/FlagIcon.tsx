@@ -21,7 +21,7 @@ export function FlagIcon({ targetUserId, viewerId }: FlagIconProps) {
 
   useEffect(() => {
     if (!viewerId || viewerId === targetUserId) return;
-    fetch(`/api/users/${targetUserId}/flag`)
+    fetch(`/api/flags/users/${targetUserId}`)
       .then((r) => r.json())
       .then(setStatus)
       .catch(() => null);

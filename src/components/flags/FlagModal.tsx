@@ -48,13 +48,13 @@ export function FlagModal({ targetUserId, currentStatus, onClose, onChange }: Pr
   async function handleSubmit() {
     if (!selectedAttributeId) return;
     setSaving(true);
-    const res = await fetch(`/api/users/${targetUserId}/flag`, {
+    const res = await fetch(`/api/flags/users/${targetUserId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ attributeId: selectedAttributeId, note: note.trim() || undefined }),
     });
     if (res.ok) {
-      const updated: FlagStatus = await fetch(`/api/users/${targetUserId}/flag`).then((r) => r.json());
+      const updated: FlagStatus = await fetch(`/api/flags/users/${targetUserId}`).then((r) => r.json());
       onChange(updated);
     }
     setSaving(false);
@@ -64,13 +64,13 @@ export function FlagModal({ targetUserId, currentStatus, onClose, onChange }: Pr
   async function handleRemove() {
     if (!selectedAttributeId) return;
     setRemoving(true);
-    const res = await fetch(`/api/users/${targetUserId}/flag`, {
+    const res = await fetch(`/api/flags/users/${targetUserId}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ attributeId: selectedAttributeId }),
     });
     if (res.ok) {
-      const updated: FlagStatus = await fetch(`/api/users/${targetUserId}/flag`).then((r) => r.json());
+      const updated: FlagStatus = await fetch(`/api/flags/users/${targetUserId}`).then((r) => r.json());
       onChange(updated);
     }
     setRemoving(false);
