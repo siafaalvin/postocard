@@ -27,13 +27,14 @@ export function SignupForm() {
 
     setLoading(false);
 
+    const data = await res.json();
+
     if (!res.ok) {
-      const data = await res.json();
       setError(typeof data.error === "string" ? data.error : "Something went wrong");
       return;
     }
 
-    router.push("/subscribe");
+    router.push(data.paymentRequired === false ? "/login" : "/subscribe");
   }
 
   return (

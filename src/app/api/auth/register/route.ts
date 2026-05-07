@@ -28,11 +28,21 @@ export async function POST(req: NextRequest) {
   }
 
   const passwordHash = await hash(password, 12);
+  const skipPayment = process.env.SKIP_PAYMENT_GATE === "true";
 
   const user = await prisma.user.create({
-    data: { email, username, displayName, passwordHash },
+    data: {
+      email,
+      username,
+      displayName,
+      passwordHash,
+      ...(skipPayment && {
+        registrationPaidAt: new Date(),
+        renewalDueAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+      }),
+    },
     select: { id: true, email: true, username: true },
   });
 
-  return NextResponse.json(user, { status: 201 });
+  return NextResponse.json({ ...user, paymentRequired: !skipPayment }, { status: 201 });
 }

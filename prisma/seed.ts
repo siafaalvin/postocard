@@ -84,7 +84,7 @@ async function teardown() {
     prisma.mute.deleteMany(),
     prisma.follow.deleteMany(),
     prisma.post.deleteMany(),
-    prisma.user.deleteMany(),
+    // Users are intentionally preserved — real accounts survive re-seeds
   ])
 }
 
@@ -100,84 +100,35 @@ async function main() {
   // ── Users ──────────────────────────────────────────────────────────────────
 
   const [admin, alice, bob, carol, dave, eve] = await Promise.all([
-    prisma.user.create({
-      data: {
-        email: 'admin@postocard.app',
-        passwordHash: pw,
-        username: 'admin',
-        displayName: 'Postocard Admin',
-        bio: 'Platform admin account.',
-        visibility: UserVisibility.public,
-        tier: UserTier.admin,
-        registrationPaidAt: daysAgo(90),
-        renewalDueAt: daysFromNow(275),
-      },
+    prisma.user.upsert({
+      where: { email: 'admin@postocard.app' },
+      update: { passwordHash: pw, username: 'admin', displayName: 'Postocard Admin', bio: 'Platform admin account.', visibility: UserVisibility.public, tier: UserTier.admin, registrationPaidAt: daysAgo(90), renewalDueAt: daysFromNow(275) },
+      create: { email: 'admin@postocard.app', passwordHash: pw, username: 'admin', displayName: 'Postocard Admin', bio: 'Platform admin account.', visibility: UserVisibility.public, tier: UserTier.admin, registrationPaidAt: daysAgo(90), renewalDueAt: daysFromNow(275) },
     }),
-    prisma.user.create({
-      data: {
-        email: 'alice@test.com',
-        passwordHash: pw,
-        username: 'alice',
-        displayName: 'Alice Pearce',
-        bio: 'Street photographer based in NYC.',
-        visibility: UserVisibility.public,
-        tier: UserTier.basic,
-        cameraOnlyMode: true, // F7: alice uses camera-only mode
-        registrationPaidAt: daysAgo(30),
-        renewalDueAt: daysFromNow(335),
-      },
+    prisma.user.upsert({
+      where: { email: 'alice@test.com' },
+      update: { passwordHash: pw, username: 'alice', displayName: 'Alice Pearce', bio: 'Street photographer based in NYC.', visibility: UserVisibility.public, tier: UserTier.basic, cameraOnlyMode: true, registrationPaidAt: daysAgo(30), renewalDueAt: daysFromNow(335) },
+      create: { email: 'alice@test.com', passwordHash: pw, username: 'alice', displayName: 'Alice Pearce', bio: 'Street photographer based in NYC.', visibility: UserVisibility.public, tier: UserTier.basic, cameraOnlyMode: true, registrationPaidAt: daysAgo(30), renewalDueAt: daysFromNow(335) },
     }),
-    prisma.user.create({
-      data: {
-        email: 'bob@test.com',
-        passwordHash: pw,
-        username: 'bob',
-        displayName: 'Bob Morrow',
-        bio: 'Travel and food photography.',
-        visibility: UserVisibility.public,
-        tier: UserTier.plus,
-        registrationPaidAt: daysAgo(60),
-        renewalDueAt: daysFromNow(305),
-      },
+    prisma.user.upsert({
+      where: { email: 'bob@test.com' },
+      update: { passwordHash: pw, username: 'bob', displayName: 'Bob Morrow', bio: 'Travel and food photography.', visibility: UserVisibility.public, tier: UserTier.plus, registrationPaidAt: daysAgo(60), renewalDueAt: daysFromNow(305) },
+      create: { email: 'bob@test.com', passwordHash: pw, username: 'bob', displayName: 'Bob Morrow', bio: 'Travel and food photography.', visibility: UserVisibility.public, tier: UserTier.plus, registrationPaidAt: daysAgo(60), renewalDueAt: daysFromNow(305) },
     }),
-    prisma.user.create({
-      data: {
-        email: 'carol@test.com',
-        passwordHash: pw,
-        username: 'carol',
-        displayName: 'Carol Kim',
-        bio: 'Just here for the vibes.',
-        visibility: UserVisibility.private,
-        tier: UserTier.basic,
-        registrationPaidAt: daysAgo(15),
-        renewalDueAt: daysFromNow(350),
-      },
+    prisma.user.upsert({
+      where: { email: 'carol@test.com' },
+      update: { passwordHash: pw, username: 'carol', displayName: 'Carol Kim', bio: 'Just here for the vibes.', visibility: UserVisibility.private, tier: UserTier.basic, registrationPaidAt: daysAgo(15), renewalDueAt: daysFromNow(350) },
+      create: { email: 'carol@test.com', passwordHash: pw, username: 'carol', displayName: 'Carol Kim', bio: 'Just here for the vibes.', visibility: UserVisibility.private, tier: UserTier.basic, registrationPaidAt: daysAgo(15), renewalDueAt: daysFromNow(350) },
     }),
-    prisma.user.create({
-      data: {
-        email: 'dave@test.com',
-        passwordHash: pw,
-        username: 'dave',
-        displayName: 'Dave Rivera',
-        bio: '',
-        visibility: UserVisibility.private,
-        tier: UserTier.basic,
-        registrationPaidAt: daysAgo(10),
-        renewalDueAt: daysFromNow(355),
-      },
+    prisma.user.upsert({
+      where: { email: 'dave@test.com' },
+      update: { passwordHash: pw, username: 'dave', displayName: 'Dave Rivera', bio: '', visibility: UserVisibility.private, tier: UserTier.basic, registrationPaidAt: daysAgo(10), renewalDueAt: daysFromNow(355) },
+      create: { email: 'dave@test.com', passwordHash: pw, username: 'dave', displayName: 'Dave Rivera', bio: '', visibility: UserVisibility.private, tier: UserTier.basic, registrationPaidAt: daysAgo(10), renewalDueAt: daysFromNow(355) },
     }),
-    prisma.user.create({
-      data: {
-        email: 'eve@test.com',
-        passwordHash: pw,
-        username: 'eve',
-        displayName: 'Eve Santos',
-        bio: 'Content creator ✨',
-        visibility: UserVisibility.public,
-        tier: UserTier.basic,
-        registrationPaidAt: daysAgo(5),
-        renewalDueAt: daysFromNow(360),
-      },
+    prisma.user.upsert({
+      where: { email: 'eve@test.com' },
+      update: { passwordHash: pw, username: 'eve', displayName: 'Eve Santos', bio: 'Content creator ✨', visibility: UserVisibility.public, tier: UserTier.basic, registrationPaidAt: daysAgo(5), renewalDueAt: daysFromNow(360) },
+      create: { email: 'eve@test.com', passwordHash: pw, username: 'eve', displayName: 'Eve Santos', bio: 'Content creator ✨', visibility: UserVisibility.public, tier: UserTier.basic, registrationPaidAt: daysAgo(5), renewalDueAt: daysFromNow(360) },
     }),
   ])
 
