@@ -10,6 +10,9 @@ out/
 .env.local
 .env.*.local
 
+# Local dev credentials
+docs/test-accounts.md
+
 # Prisma
 prisma/.DS_Store
 
