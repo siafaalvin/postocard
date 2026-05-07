@@ -1,0 +1,445 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum UserVisibility {
+  public
+  private
+}
+
+enum UserTier {
+  basic
+  plus
+  creator
+  admin
+}
+
+enum PostType {
+  image
+  video
+  status
+}
+
+enum PostVisibility {
+  public
+  followers
+}
+
+enum FollowStatus {
+  active
+  pending
+}
+
+enum EventType {
+  followed
+  unfollowed
+  follow_requested
+  muted
+  blocked
+  liked_post
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// User
+// ─────────────────────────────────────────────────────────────────────────────
+
+model User {
+  id              String         @id @default(cuid())
+  email           String         @unique
+  passwordHash    String
+  username        String         @unique @db.VarChar(30)
+  displayName     String         @db.VarChar(50)
+  avatarUrl       String?
+  bio             String?        @db.VarChar(500)
+  visibility      UserVisibility @default(public)
+  tier            UserTier       @default(basic)
+  cameraOnlyMode  Boolean        @default(false)
+  registrationPaidAt DateTime?
+  renewalDueAt       DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Posts & interactions
+  posts           Post[]
+  likes           Like[]
+  comments        Comment[]
+  replies         Reply[]
+  commentLikes    CommentLike[]
+
+  // Social graph
+  following       Follow[]       @relation("Follower")  // people this user follows
+  followers       Follow[]       @relation("Following") // people who follow this user
+  muting          Mute[]         @relation("Muter")
+  mutedBy         Mute[]         @relation("Muted")
+  blocking        Block[]        @relation("Blocker")
+  blockedBy       Block[]        @relation("Blocked")
+
+  // Calendar
+  userEvents      UserEvent[]    @relation("EventOwner")
+  targetEvents    UserEvent[]    @relation("EventTarget")
+
+  // Feed cap tracking
+  feedDailyCounts FeedDailyCount[]
+
+  // View extensions (F1)
+  viewExtensions  ViewExtension[]
+
+  // Temporary profile grants (F2)
+  grantsGiven     TemporaryProfileGrant[] @relation("GrantsGiven")
+  grantsReceived  TemporaryProfileGrant[] @relation("GrantsReceived")
+
+  // Block lists (F6)
+  blockLists      BlockList[]
+  blockListEntries BlockListEntry[] @relation("BlockListEntries")
+
+  // Flagging (F8)
+  flagsPlaced   UserFlag[] @relation("FlagPlacer")
+  flagsReceived UserFlag[] @relation("FlaggedUser")
+  publicFlags   PublicFlag[]
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Post
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Post {
+  id            String         @id @default(cuid())
+  authorId      String
+  author        User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  type          PostType
+  mediaKey      String?                          // S3 object key; null for status posts
+  caption       String?        @db.VarChar(2200)
+  lat           Float?
+  lng           Float?
+  visibility    PostVisibility @default(public)
+  likeCount     Int            @default(0)
+  mediaMetadata Json?                            // raw EXIF fields extracted client-side (F7)
+  hasCamera     Boolean        @default(false)   // true when EXIF Make+Model present (F7)
+  createdAt     DateTime       @default(now())
+  deletedAt     DateTime?
+
+  likes         Like[]
+  comments      Comment[]
+  userEvents    UserEvent[]
+
+  @@index([authorId, createdAt])
+  @@index([createdAt])
+  @@index([lat, lng])
+  @@index([hasCamera])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Like
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Comment
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Comment {
+  id               String    @id @default(cuid())
+  postId           String
+  post             Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId         String
+  author           User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body             String    @db.VarChar(2200)
+  commentLikeCount Int       @default(0)
+  createdAt        DateTime  @default(now())
+  deletedAt        DateTime?
+
+  replies          Reply[]
+  commentLikes     CommentLike[]
+  grants           TemporaryProfileGrant[]  // grants triggered by this comment (F2)
+
+  @@index([postId, createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Reply (F3 — one level deep only)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Reply {
+  id        String    @id @default(cuid())
+  commentId String
+  comment   Comment   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String    @db.VarChar(2200)
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  grants    TemporaryProfileGrant[]  // grants triggered by this reply (F2)
+
+  @@index([commentId, createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CommentLike (F4 — needed for mass-block by comment likers)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model CommentLike {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commentId String
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, commentId])
+  @@index([commentId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Follow
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Follow {
+  id          String       @id @default(cuid())
+  followerId  String
+  follower    User         @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User         @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+  status      FollowStatus @default(active)
+  createdAt   DateTime     @default(now())
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mute — F5: adds context fields
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Mute {
+  id              String   @id @default(cuid())
+  muterId         String
+  muter           User     @relation("Muter", fields: [muterId], references: [id], onDelete: Cascade)
+  mutedId         String
+  muted           User     @relation("Muted", fields: [mutedId], references: [id], onDelete: Cascade)
+  contextNote     String?  @db.VarChar(200)
+  contextHashtag  String?  @db.VarChar(100)
+  visibleToTarget Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  @@unique([muterId, mutedId])
+  @@index([muterId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Block — F5: adds context fields
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Block {
+  id              String   @id @default(cuid())
+  blockerId       String
+  blocker         User     @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockedId       String
+  blocked         User     @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+  contextNote     String?  @db.VarChar(200)
+  contextHashtag  String?  @db.VarChar(100)
+  visibleToTarget Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UserEvent — calendar interaction log
+// ─────────────────────────────────────────────────────────────────────────────
+
+model UserEvent {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation("EventOwner", fields: [userId], references: [id], onDelete: Cascade)
+  eventType    EventType
+  targetUserId String?
+  targetUser   User?     @relation("EventTarget", fields: [targetUserId], references: [id], onDelete: SetNull)
+  targetPostId String?
+  targetPost   Post?     @relation(fields: [targetPostId], references: [id], onDelete: SetNull)
+  createdAt    DateTime  @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FeedDailyCount — daily post-view tracking for cap enforcement
+// ─────────────────────────────────────────────────────────────────────────────
+
+model FeedDailyCount {
+  id      String   @id @default(cuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date    DateTime @db.Date
+  count   Int      @default(0)
+
+  @@unique([userId, date])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TopFeedSnapshot — hourly computed list of top-100 post IDs
+// ─────────────────────────────────────────────────────────────────────────────
+
+model TopFeedSnapshot {
+  id          String   @id @default(cuid())
+  computedAt  DateTime @default(now())
+  postIds     Json     // ordered array of Post IDs
+
+  @@index([computedAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ViewExtension (F1) — $1 / 200 extra posts / 7 days
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ViewExtension {
+  id                    String   @id @default(cuid())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripePaymentIntentId String   @unique
+  postsGranted          Int      @default(200)
+  usedCount             Int      @default(0)
+  expiresAt             DateTime
+  createdAt             DateTime @default(now())
+
+  @@index([userId, expiresAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TemporaryProfileGrant (F2) — time-limited profile visibility for private users
+// ─────────────────────────────────────────────────────────────────────────────
+
+model TemporaryProfileGrant {
+  id               String   @id @default(cuid())
+  grantedById      String                          // the private user whose profile becomes visible
+  grantedBy        User     @relation("GrantsGiven", fields: [grantedById], references: [id], onDelete: Cascade)
+  grantedToId      String                          // the user who can now view that profile
+  grantedTo        User     @relation("GrantsReceived", fields: [grantedToId], references: [id], onDelete: Cascade)
+  triggerCommentId String?
+  triggerComment   Comment? @relation(fields: [triggerCommentId], references: [id], onDelete: SetNull)
+  triggerReplyId   String?
+  triggerReply     Reply?   @relation(fields: [triggerReplyId], references: [id], onDelete: SetNull)
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  @@unique([grantedById, grantedToId])
+  @@index([grantedToId, expiresAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BlockList + BlockListEntry (F6) — shareable block lists
+// ─────────────────────────────────────────────────────────────────────────────
+
+model BlockList {
+  id          String           @id @default(cuid())
+  ownerId     String
+  owner       User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name        String           @db.VarChar(100)
+  slug        String           @unique         // 12-char random token for shareable URL
+  isPublic    Boolean          @default(true)
+  importCount Int              @default(0)
+  entries     BlockListEntry[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([ownerId])
+}
+
+model BlockListEntry {
+  id            String    @id @default(cuid())
+  blockListId   String
+  blockList     BlockList @relation(fields: [blockListId], references: [id], onDelete: Cascade)
+  blockedUserId String
+  blockedUser   User      @relation("BlockListEntries", fields: [blockedUserId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+
+  @@unique([blockListId, blockedUserId])
+  @@index([blockListId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Flagging (F8) — personal + public threshold flags
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum FlagType {
+  red
+}
+
+model FlagAttribute {
+  id          String     @id @default(cuid())
+  label       String
+  category    String
+  type        FlagType   @default(red)
+  flags       UserFlag[]
+  publicFlags PublicFlag[]
+
+  @@index([category])
+}
+
+// One personal flag per (placer, flaggedUser, attribute) triple
+model UserFlag {
+  id            String        @id @default(cuid())
+  placerId      String
+  placer        User          @relation("FlagPlacer",  fields: [placerId],      references: [id], onDelete: Cascade)
+  flaggedUserId String
+  flaggedUser   User          @relation("FlaggedUser", fields: [flaggedUserId], references: [id], onDelete: Cascade)
+  attributeId   String
+  attribute     FlagAttribute @relation(fields: [attributeId], references: [id])
+  note          String?       @db.VarChar(100)
+  createdAt     DateTime      @default(now())
+
+  @@unique([placerId, flaggedUserId, attributeId])
+  @@index([flaggedUserId])
+}
+
+// Aggregate: one row per (flaggedUser, attribute); becomes public when flagCount >= 10
+model PublicFlag {
+  id            String               @id @default(cuid())
+  flaggedUserId String
+  flaggedUser   User                 @relation(fields: [flaggedUserId], references: [id], onDelete: Cascade)
+  attributeId   String
+  attribute     FlagAttribute        @relation(fields: [attributeId], references: [id])
+  flagCount     Int                  @default(0)
+  isActive      Boolean              @default(false) // true when flagCount >= 10; false after paid removal
+  removalCount  Int                  @default(0)     // increments each time flaggedUser pays to remove
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  payments      FlagRemovalPayment[]
+
+  @@unique([flaggedUserId, attributeId])
+  @@index([flaggedUserId])
+}
+
+// Stripe payment record for each public-flag removal
+model FlagRemovalPayment {
+  id                    String     @id @default(cuid())
+  publicFlagId          String
+  publicFlag            PublicFlag @relation(fields: [publicFlagId], references: [id])
+  stripePaymentIntentId String     @unique
+  amountCents           Int        // 100 | 1000 | 10000 | 100000
+  offenseNumber         Int        // 1–4
+  paidAt                DateTime   @default(now())
+}
