@@ -13,6 +13,9 @@ out/
 # Local dev credentials
 docs/test-accounts.md
 
+# Internal planning docs (PRDs, roadmaps, error logs — not for public repos)
+planning/
+
 # Prisma
 prisma/.DS_Store
 
