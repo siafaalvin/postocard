@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { PostCard } from "@/components/feed/PostCard";
 import type { FeedCapacity } from "@/lib/feed";
 
@@ -27,6 +27,7 @@ export function MainFeed({ userId, initialCapacity }: Props) {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [atCap, setAtCap] = useState(initialCapacity.atCap);
+  const initialFetchDone = useRef(false);
 
   const loadMore = useCallback(async () => {
     if (loading || !hasMore || atCap) return;
@@ -42,7 +43,10 @@ export function MainFeed({ userId, initialCapacity }: Props) {
       setAtCap(true);
       setHasMore(false);
     } else {
-      setPosts((prev) => [...prev, ...data.posts]);
+      setPosts((prev) => {
+        const existingIds = new Set(prev.map((p) => p.id));
+        return [...prev, ...data.posts.filter((p: Post) => !existingIds.has(p.id))];
+      });
       setCursor(data.nextCursor);
       setHasMore(!!data.nextCursor);
     }
@@ -51,6 +55,8 @@ export function MainFeed({ userId, initialCapacity }: Props) {
   }, [loading, hasMore, atCap, cursor]);
 
   useEffect(() => {
+    if (initialFetchDone.current) return;
+    initialFetchDone.current = true;
     loadMore();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

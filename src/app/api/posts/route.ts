@@ -23,7 +23,9 @@ export async function GET(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { searchParams } = new URL(req.url);
-  const cursor = searchParams.get("cursor");
+  const cursorParam = searchParams.get("cursor");
+  // cursor encodes "ISO_DATE|cuid" so ties on createdAt are broken by id
+  const [cursorDate, cursorId] = cursorParam ? cursorParam.split("|") : [null, null];
 
   const capacity = await getFeedCapacity(session.user.id, session.user.tier);
   if (capacity.atCap) {
@@ -51,9 +53,16 @@ export async function GET(req: NextRequest) {
       ...(user?.cameraOnlyMode
         ? { OR: [{ hasCamera: true }, { type: "video" }, { type: "status" }] }
         : {}),
-      ...(cursor ? { createdAt: { lt: new Date(cursor) } } : {}),
+      ...(cursorDate
+        ? {
+            OR: [
+              { createdAt: { lt: new Date(cursorDate) } },
+              ...(cursorId ? [{ createdAt: new Date(cursorDate), id: { lt: cursorId } }] : []),
+            ],
+          }
+        : {}),
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: limit,
     include: {
       author: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
@@ -65,7 +74,8 @@ export async function GET(req: NextRequest) {
     await incrementFeedCount(session.user.id, posts.length);
   }
 
-  const nextCursor = posts.length === limit ? posts[posts.length - 1].createdAt.toISOString() : null;
+  const lastPost = posts.length === limit ? posts[posts.length - 1] : null;
+  const nextCursor = lastPost ? `${lastPost.createdAt.toISOString()}|${lastPost.id}` : null;
 
   // Resolve signed URLs: pass through full URLs directly (dev placeholders), presign S3 keys otherwise
   const { presignDownload } = await import("@/lib/storage");

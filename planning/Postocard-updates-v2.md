@@ -1,0 +1,53 @@
+- [ ] User Tiers:
+  - [ ] Guest (Free): 100-post main feed, view only (no Likes or comments)
+  - [ ] Basic ($1/year): 100-post main feed, Likes/Comment privileges
+  - [ ] Plus ($2/year): 250-post main feed, 10 location feeds, 1 alternate display name, 2x punitive fees
+  - [ ] Creator ($5): 500-post main feed, 10 location feeds, 2 alternate display names, 4x punitive fees
+  - [ ] Moderator (system/employee)
+  - [ ] Admin (system/employee)
+- [ ] User Add-Ons
+  - [ ] Verified Badge
+  - [ ] Media Badge
+  - [ ] Business Badge
+  - [ ] Institution Badge (school)
+  - [ ] Non-Profit Badge
+- [ ] Registration
+  - [ ] Overview: onboarding component for new users 
+  - [ ] Process: First Name, Last Name, CC/Debit Card with name (not charged), Zip Code/Postal Code, SMS Verification,Vouch (optional), Review, Submit
+  - [ ] Vouch System: 
+    - [ ] Overview: new registrants can sign up with (4) other new registrants or (1) existing user gain advanced account privileges at the basic subscription rate, or to restore account privileges after punitive action has taken place
+    - [ ] Collective punishment: if one account comes under review for punitive action, the results of that action applies to the other associated accounts
+  - [ ] Username validation: users can transfer over their username from other social media platforms (Meta, X, Bluesky, Tiktok/Douyin, Snap, YT, Reddit)
+    - [ ] if "username already exists", registering user can issue a Username Validation Challenge
+      - [ ] Users must submit outside account's registration date.
+      - [ ] Account with oldest start date receives username; other account must use variant or change name entirely
+- [ ] Direct Message (DMs): no DMs or private messaging in-platform
+  - [ ] Profile will have option for users to add their Housecall public ID (part of the Konvo-pwa project)
+- [ ] Series: Instagram Stories equivalent
+  - [ ] UI: full screen video, search bar and auto-play start/stop anchored to footer, secondary menu above footer (view count, Like/Like count, comment, share, hide menus/avatar column) and user avatars in a column on the right
+    - [ ] Accessing Series view: from home feed, pull down on the screen to enter Tales view
+  - [ ] Tab (main, photo only, Episodes)
+- [ ] Main Feed 
+  - [ ] views: main feed, Notifications/Activity feed, Local Feed
+    - [ ] Main feed filter: Camera-only, Status Updates only
+    - [ ] Local feed based on user's current location or location specified in profile
+      - [ ] Accounts with higher feed privileges can add additional location feeds 
+  - [ ] Notifications/Activity view: see all comments, replies, Liked content
+- [ ] Change ‘Calendar’ to ‘Activity’
+  - [ ] when viewing other user’s profile, change ‘Calendar’ to ‘Interactions’
+- [ ] View another user’s followers/following count in a modal onClick (desktop) and onTap (mobile)
+- [ ] Accredited content 
+  - [ ] Breadcrumbs 
+  - [ ] Content theft/plagiarism process: User A flags User B -> User A connects Post A (original) to Post B (plagiarism/theft) -> AI checks post content + post fate + UserA/UserB interaction history/following list -> AI determines if PostB stays up and UserB gets flagged
+  - [ ] user profile page
+  - [ ] followers/following modal
+  - [ ] Interaction history page
+- [ ] Ad Folder page: all ads/promos served from BubblAds network (separate project) display in an email-style mailbox format
+- [ ] Fantasy Earnings Platform
+- [ ] User Profile page:  
+  - [ ] Add zip code field to settings (do not display publicly)
+- [ ] Posting changes
+  - [ ] Captions are required for image or video posts
+  - [ ] limit status udpates to 250 characters
+  - [ ] Visibility options: public, followers, people I follow, people I mention
+  - [ ] people I mention option: field for entering users (autocompleted), separated by commas (up to 20 users)
