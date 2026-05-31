@@ -17,11 +17,15 @@ export async function GET(_req: NextRequest) {
       displayName: true,
       avatarUrl: true,
       bio: true,
+      zipCode: true,
+      konvoId: true,
       visibility: true,
       tier: true,
       cameraOnlyMode: true,
+      statusOnlyMode: true,
       registrationPaidAt: true,
       renewalDueAt: true,
+      alternateNames: { select: { id: true, name: true, slot: true }, orderBy: { slot: "asc" } },
     },
   });
 
@@ -31,8 +35,11 @@ export async function GET(_req: NextRequest) {
 const UpdateSchema = z.object({
   displayName: z.string().min(1).max(50).optional(),
   bio: z.string().max(500).optional(),
+  zipCode: z.string().max(10).optional(),
+  konvoId: z.string().max(100).optional(),
   visibility: z.enum(["public", "private"]).optional(),
   cameraOnlyMode: z.boolean().optional(),
+  statusOnlyMode: z.boolean().optional(),
   avatarUrl: z.string().url().optional(),
 });
 
@@ -53,8 +60,11 @@ export async function PATCH(req: NextRequest) {
       displayName: true,
       avatarUrl: true,
       bio: true,
+      zipCode: true,
+      konvoId: true,
       visibility: true,
       cameraOnlyMode: true,
+      statusOnlyMode: true,
     },
   });
 

@@ -17,9 +17,11 @@ enum UserVisibility {
 }
 
 enum UserTier {
+  guest
   basic
   plus
   creator
+  moderator
   admin
 }
 
@@ -32,6 +34,15 @@ enum PostType {
 enum PostVisibility {
   public
   followers
+  following
+  mentioned
+}
+
+enum NotificationType {
+  new_follower
+  post_liked
+  post_commented
+  comment_replied
 }
 
 enum FollowStatus {
@@ -60,9 +71,16 @@ model User {
   displayName     String         @db.VarChar(50)
   avatarUrl       String?
   bio             String?        @db.VarChar(500)
+  zipCode         String?        @db.VarChar(10)
+  konvoId         String?
   visibility      UserVisibility @default(public)
   tier            UserTier       @default(basic)
+  firstName       String?
+  lastName        String?
+  phoneNumber     String?
+  phoneVerifiedAt DateTime?
   cameraOnlyMode  Boolean        @default(false)
+  statusOnlyMode  Boolean        @default(false)
   registrationPaidAt DateTime?
   renewalDueAt       DateTime?
   createdAt       DateTime       @default(now())
@@ -105,6 +123,29 @@ model User {
   flagsPlaced   UserFlag[] @relation("FlagPlacer")
   flagsReceived UserFlag[] @relation("FlaggedUser")
   publicFlags   PublicFlag[]
+
+  // Post mentions
+  mentionedIn   PostMention[]
+
+  // Notifications
+  notificationsReceived Notification[] @relation("NotificationsReceived")
+  notificationsActed    Notification[] @relation("NotificationsActed")
+
+  // Alternate display names (Plus: 1, Creator: 2)
+  alternateNames  UserDisplayName[]
+
+  // Vouch system
+  vouchesGiven  Vouch[] @relation("UserVouches")
+  vouchReceived Vouch?  @relation("UserVouched")
+
+  // Username challenges
+  challenges  UsernameChallenge[]
+
+  // Ad Folder
+  ads  AdDelivery[]
+
+  // Local feeds
+  savedLocationFeeds  SavedLocationFeed[]
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -130,6 +171,8 @@ model Post {
   likes         Like[]
   comments      Comment[]
   userEvents    UserEvent[]
+  mentions      PostMention[]
+  notifications Notification[]
 
   @@index([authorId, createdAt])
   @@index([createdAt])
@@ -171,6 +214,7 @@ model Comment {
   replies          Reply[]
   commentLikes     CommentLike[]
   grants           TemporaryProfileGrant[]  // grants triggered by this comment (F2)
+  notifications    Notification[]
 
   @@index([postId, createdAt])
 }
@@ -189,7 +233,8 @@ model Reply {
   createdAt DateTime  @default(now())
   deletedAt DateTime?
 
-  grants    TemporaryProfileGrant[]  // grants triggered by this reply (F2)
+  grants        TemporaryProfileGrant[]  // grants triggered by this reply (F2)
+  notifications Notification[]
 
   @@index([commentId, createdAt])
 }
@@ -442,4 +487,130 @@ model FlagRemovalPayment {
   amountCents           Int        // 100 | 1000 | 10000 | 100000
   offenseNumber         Int        // 1–4
   paidAt                DateTime   @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PostMention — explicit mention list for visibility: mentioned posts
+// ─────────────────────────────────────────────────────────────────────────────
+
+model PostMention {
+  id     String @id @default(cuid())
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Notification — activity feed entries
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Notification {
+  id          String           @id @default(cuid())
+  recipientId String
+  recipient   User             @relation("NotificationsReceived", fields: [recipientId], references: [id], onDelete: Cascade)
+  actorId     String
+  actor       User             @relation("NotificationsActed", fields: [actorId], references: [id], onDelete: Cascade)
+  type        NotificationType
+  postId      String?
+  post        Post?            @relation(fields: [postId], references: [id], onDelete: SetNull)
+  commentId   String?
+  comment     Comment?         @relation(fields: [commentId], references: [id], onDelete: SetNull)
+  replyId     String?
+  reply       Reply?           @relation(fields: [replyId], references: [id], onDelete: SetNull)
+  read        Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  @@index([recipientId, read, createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UserDisplayName — saved alternate display names (Plus: slot 1, Creator: slots 1-2)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model UserDisplayName {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String   @db.VarChar(50)
+  slot      Int
+  createdAt DateTime @default(now())
+
+  @@unique([userId, slot])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Vouch — existing user vouching for a new registrant
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Vouch {
+  id        String   @id @default(cuid())
+  voucherId String
+  voucher   User     @relation("UserVouches", fields: [voucherId], references: [id])
+  newUserId String   @unique
+  newUser   User     @relation("UserVouched", fields: [newUserId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([voucherId, newUserId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UsernameChallenge — dispute over a username taken by an earlier registrant
+// ─────────────────────────────────────────────────────────────────────────────
+
+model UsernameChallenge {
+  id           String   @id @default(cuid())
+  username     String
+  challengerId String?
+  challenger   User?    @relation(fields: [challengerId], references: [id], onDelete: SetNull)
+  evidence     String   @db.VarChar(1000)
+  status       String   @default("pending")
+  createdAt    DateTime @default(now())
+
+  @@index([username])
+  @@index([challengerId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SavedLocationFeed — named location feeds saved by Plus/Creator users
+// ─────────────────────────────────────────────────────────────────────────────
+
+model SavedLocationFeed {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String   @db.VarChar(100)
+  lat       Float
+  lng       Float
+  radiusKm  Float    @default(25)
+  slot      Int
+  createdAt DateTime @default(now())
+
+  @@unique([userId, slot])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AdDelivery — ads pushed from BubblAds network into the user's Ad Folder
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AdDelivery {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title      String    @db.VarChar(200)
+  body       String    @db.VarChar(2000)
+  ctaUrl     String?
+  imageUrl   String?
+  source     String    @default("bubblads")
+  read       Boolean   @default(false)
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId, read, createdAt])
 }

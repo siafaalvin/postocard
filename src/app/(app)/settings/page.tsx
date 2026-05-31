@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { AccountSettings } from "@/components/settings/AccountSettings";
+import { SettingsTabs } from "@/components/settings/SettingsTabs";
 
 export const metadata: Metadata = { title: "Settings" };
 
@@ -21,9 +21,11 @@ export default async function SettingsPage() {
       avatarUrl: true,
       visibility: true,
       tier: true,
-      cameraOnlyMode: true,
+      zipCode: true,
+      konvoId: true,
       registrationPaidAt: true,
       renewalDueAt: true,
+      alternateNames: { select: { id: true, name: true, slot: true }, orderBy: { slot: "asc" } },
     },
   });
 
@@ -32,7 +34,7 @@ export default async function SettingsPage() {
   return (
     <div>
       <h1 className="mb-6 text-xl font-bold">Settings</h1>
-      <AccountSettings user={user} />
+      <SettingsTabs user={user} />
     </div>
   );
 }

@@ -4,9 +4,11 @@ import { PRICES } from "./stripe";
 const PUBLIC_FLAG_THRESHOLD = 10;
 const MAX_PAID_REMOVALS = 4;
 
-export function getPublicFlagRemovalPrice(removalCount: number): number {
-  const prices = [PRICES.flagRemoval1, PRICES.flagRemoval2, PRICES.flagRemoval3, PRICES.flagRemoval4];
-  return prices[removalCount] ?? 0;
+const TIER_MULTIPLIERS: Record<string, number> = { plus: 2, creator: 4 };
+
+export function getPublicFlagRemovalPrice(removalCount: number, tier?: string): number {
+  const base = [PRICES.flagRemoval1, PRICES.flagRemoval2, PRICES.flagRemoval3, PRICES.flagRemoval4][removalCount] ?? 0;
+  return base * (TIER_MULTIPLIERS[tier ?? ""] ?? 1);
 }
 
 export function canRemovePublicFlag(removalCount: number): boolean {

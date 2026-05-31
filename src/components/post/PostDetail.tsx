@@ -163,9 +163,9 @@ export function PostDetail({ post, viewerId }: Props) {
                     navigator.clipboard.writeText(url);
                     setCopied(true);
                   }}
-                  className="flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-700"
+                  className="flex items-center text-neutral-400 hover:text-neutral-700"
                 >
-                  <Link2 className="h-3 w-3" /> Share
+                  <Link2 className="h-3 w-3" />
                 </button>
               </div>
             </div>

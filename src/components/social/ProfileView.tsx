@@ -6,6 +6,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { PostCard } from "@/components/feed/PostCard";
 import { FlagIcon } from "@/components/flags/FlagIcon";
+import { FollowersModal } from "@/components/social/FollowersModal";
 
 interface User {
   id: string;
@@ -13,6 +14,7 @@ interface User {
   displayName: string;
   avatarUrl?: string | null;
   bio?: string | null;
+  konvoId?: string | null;
   visibility: string;
   _count: { posts: number; followers: number; following: number };
 }
@@ -27,6 +29,7 @@ export function ProfileView({ user, viewerId, blockContext }: Props) {
   const [following, setFollowing] = useState(false);
   const [posts, setPosts] = useState<unknown[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [modalType, setModalType] = useState<"followers" | "following" | null>(null);
 
   const isOwn = viewerId === user.id;
 
@@ -74,11 +77,25 @@ export function ProfileView({ user, viewerId, blockContext }: Props) {
           </div>
           <p className="text-neutral-500">@{user.username}</p>
           {user.bio && <p className="mt-2 text-sm">{user.bio}</p>}
+          {user.konvoId && (
+            <a
+              href={`https://housecall.app/u/${user.konvoId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 block text-sm text-neutral-500 hover:underline"
+            >
+              Housecall: {user.konvoId}
+            </a>
+          )}
 
           <div className="mt-3 flex gap-4 text-sm">
             <span><strong>{user._count.posts}</strong> posts</span>
-            <span><strong>{user._count.followers}</strong> followers</span>
-            <span><strong>{user._count.following}</strong> following</span>
+            <button onClick={() => setModalType("followers")} className="hover:underline">
+              <strong>{user._count.followers}</strong> followers
+            </button>
+            <button onClick={() => setModalType("following")} className="hover:underline">
+              <strong>{user._count.following}</strong> following
+            </button>
           </div>
 
           {!isOwn && viewerId && (
@@ -86,8 +103,8 @@ export function ProfileView({ user, viewerId, blockContext }: Props) {
               <Button size="sm" variant={following ? "secondary" : "primary"} onClick={toggleFollow}>
                 {following ? "Following" : "Follow"}
               </Button>
-              <Link href={`/${user.username}/calendar`}>
-                <Button size="sm" variant="secondary">Calendar</Button>
+              <Link href={`/${user.username}/activity`}>
+                <Button size="sm" variant="secondary">Interactions</Button>
               </Link>
             </div>
           )}
@@ -96,8 +113,8 @@ export function ProfileView({ user, viewerId, blockContext }: Props) {
               <Link href="/settings">
                 <Button size="sm" variant="secondary">Edit profile</Button>
               </Link>
-              <Link href={`/${user.username}/calendar`}>
-                <Button size="sm" variant="secondary">Calendar</Button>
+              <Link href={`/${user.username}/activity`}>
+                <Button size="sm" variant="secondary">Activity</Button>
               </Link>
             </div>
           )}
@@ -110,6 +127,13 @@ export function ProfileView({ user, viewerId, blockContext }: Props) {
           <PostCard key={(post as { id: string }).id} post={post as Parameters<typeof PostCard>[0]["post"]} viewerId={viewerId} />
         ))}
       </div>
+
+      <FollowersModal
+        username={user.username}
+        type={modalType ?? "followers"}
+        open={modalType !== null}
+        onClose={() => setModalType(null)}
+      />
     </div>
   );
 }

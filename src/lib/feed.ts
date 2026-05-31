@@ -1,9 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
 const TIER_CAPS: Record<string, number> = {
+  guest: 100,
   basic: 100,
-  plus: 500,
+  plus: 250,
   creator: Infinity,
+  moderator: Infinity,
   admin: Infinity,
 };
 

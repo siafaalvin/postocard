@@ -32,6 +32,7 @@ export default async function ProfilePage({ params }: Props) {
       displayName: true,
       avatarUrl: true,
       bio: true,
+      konvoId: true,
       visibility: true,
       tier: true,
       createdAt: true,

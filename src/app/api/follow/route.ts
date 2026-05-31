@@ -38,6 +38,12 @@ export async function POST(req: NextRequest) {
     data: { userId: session.user.id, eventType, targetUserId },
   });
 
+  if (status === "active") {
+    prisma.notification.create({
+      data: { recipientId: targetUserId, actorId: session.user.id, type: "new_follower" },
+    }).catch(console.error);
+  }
+
   return NextResponse.json(follow, { status: 201 });
 }
 

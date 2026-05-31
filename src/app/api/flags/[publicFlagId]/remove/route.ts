@@ -29,7 +29,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Maximum removals reached" }, { status: 400 });
   }
 
-  const amountCents = getPublicFlagRemovalPrice(flag.removalCount);
+  const amountCents = getPublicFlagRemovalPrice(flag.removalCount, session.user.tier);
 
   const paymentIntent = await stripe.paymentIntents.create({
     amount: amountCents,

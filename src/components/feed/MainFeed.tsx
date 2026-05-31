@@ -1,8 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PostCard } from "@/components/feed/PostCard";
+import { cn } from "@/lib/utils";
 import type { FeedCapacity } from "@/lib/feed";
+
+type Filter = "all" | "camera" | "status";
+
+const FILTERS: { value: Filter; label: string }[] = [
+  { value: "all",    label: "All" },
+  { value: "camera", label: "Camera" },
+  { value: "status", label: "Status" },
+];
 
 interface Post {
   id: string;
@@ -22,22 +31,26 @@ interface Props {
 }
 
 export function MainFeed({ userId, initialCapacity }: Props) {
+  const [filter, setFilter] = useState<Filter>("all");
   const [posts, setPosts] = useState<Post[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [atCap, setAtCap] = useState(initialCapacity.atCap);
-  const initialFetchDone = useRef(false);
+  const generationRef = useRef(0);
 
-  const loadMore = useCallback(async () => {
-    if (loading || !hasMore || atCap) return;
+  async function fetchPosts(cur: string | null, f: Filter) {
+    const gen = ++generationRef.current;
     setLoading(true);
 
     const params = new URLSearchParams();
-    if (cursor) params.set("cursor", cursor);
+    if (cur) params.set("cursor", cur);
+    if (f !== "all") params.set("filter", f);
 
     const res = await fetch(`/api/posts?${params}`);
     const data = await res.json();
+
+    if (gen !== generationRef.current) return;
 
     if (data.atCap) {
       setAtCap(true);
@@ -52,29 +65,65 @@ export function MainFeed({ userId, initialCapacity }: Props) {
     }
 
     setLoading(false);
-  }, [loading, hasMore, atCap, cursor]);
+  }
 
   useEffect(() => {
-    if (initialFetchDone.current) return;
-    initialFetchDone.current = true;
-    loadMore();
+    fetchPosts(null, "all");
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (posts.length === 0 && !loading) {
-    return (
-      <p className="py-12 text-center text-neutral-500">
-        Follow some people to see their posts here.
-      </p>
-    );
+  function changeFilter(f: Filter) {
+    if (f === filter) return;
+    setFilter(f);
+    setPosts([]);
+    setCursor(null);
+    setHasMore(true);
+    setAtCap(initialCapacity.atCap);
+    fetchPosts(null, f);
+  }
+
+  function loadMore() {
+    if (!loading && hasMore && !atCap) fetchPosts(cursor, filter);
   }
 
   return (
     <div>
+      {/* Filter pill bar */}
+      <div className="flex gap-2 border-b border-neutral-100 px-4 py-2.5 dark:border-neutral-800">
+        {FILTERS.map(({ value, label }) => (
+          <button
+            key={value}
+            onClick={() => changeFilter(value)}
+            className={cn(
+              "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+              filter === value
+                ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
+                : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700"
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {posts.length === 0 && !loading && (
+        <p className="py-12 text-center text-neutral-500">
+          {filter === "all"
+            ? "Follow some people to see their posts here."
+            : "No posts match this filter."}
+        </p>
+      )}
+
       {posts.map((post) => (
         <PostCard key={post.id} post={post} viewerId={userId} />
       ))}
 
-      {hasMore && !atCap && (
+      {loading && posts.length === 0 && (
+        <div className="flex justify-center py-8">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-neutral-300 border-t-neutral-900" />
+        </div>
+      )}
+
+      {hasMore && !atCap && posts.length > 0 && (
         <button
           onClick={loadMore}
           disabled={loading}
@@ -82,12 +131,6 @@ export function MainFeed({ userId, initialCapacity }: Props) {
         >
           {loading ? "Loading…" : "Load more"}
         </button>
-      )}
-
-      {loading && posts.length === 0 && (
-        <div className="flex justify-center py-8">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-neutral-300 border-t-neutral-900" />
-        </div>
       )}
     </div>
   );

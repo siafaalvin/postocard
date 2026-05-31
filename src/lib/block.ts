@@ -70,7 +70,7 @@ export async function massBlock(
   const alreadyBlockedIds = new Set(alreadyBlocked.map((b) => b.blockedId));
 
   const admins = await prisma.user.findMany({
-    where: { id: { in: candidateIds }, tier: "admin" },
+    where: { id: { in: candidateIds }, tier: { in: ["admin", "moderator"] } },
     select: { id: true },
   });
   const adminIds = new Set(admins.map((a) => a.id));

@@ -9,6 +9,10 @@ export async function POST(_req: NextRequest, { params }: Params) {
   const { id: postId } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (session.user.tier === "guest") return NextResponse.json({ error: "Upgrade required" }, { status: 403 });
+
+  const post = await prisma.post.findUnique({ where: { id: postId }, select: { authorId: true } });
+  if (!post) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   await prisma.$transaction([
     prisma.like.upsert({
@@ -21,6 +25,12 @@ export async function POST(_req: NextRequest, { params }: Params) {
       data: { userId: session.user.id, eventType: "liked_post", targetPostId: postId },
     }),
   ]);
+
+  if (post.authorId !== session.user.id) {
+    prisma.notification.create({
+      data: { recipientId: post.authorId, actorId: session.user.id, type: "post_liked", postId },
+    }).catch(console.error);
+  }
 
   return new NextResponse(null, { status: 204 });
 }

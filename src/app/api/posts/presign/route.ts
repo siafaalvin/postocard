@@ -5,10 +5,11 @@ import { presignUpload, mediaKey } from "@/lib/storage";
 import { z } from "zod";
 
 const TIER_LIMITS: Record<string, { image: number; video: number }> = {
-  basic:   { image: 10 * 1024 * 1024,  video: 200 * 1024 * 1024 },
-  plus:    { image: 25 * 1024 * 1024,  video: 500 * 1024 * 1024 },
-  creator: { image: 50 * 1024 * 1024,  video: 2 * 1024 * 1024 * 1024 },
-  admin:   { image: 50 * 1024 * 1024,  video: 2 * 1024 * 1024 * 1024 },
+  basic:     { image: 10 * 1024 * 1024,  video: 200 * 1024 * 1024 },
+  plus:      { image: 25 * 1024 * 1024,  video: 500 * 1024 * 1024 },
+  creator:   { image: 50 * 1024 * 1024,  video: 2 * 1024 * 1024 * 1024 },
+  moderator: { image: 50 * 1024 * 1024,  video: 2 * 1024 * 1024 * 1024 },
+  admin:     { image: 50 * 1024 * 1024,  video: 2 * 1024 * 1024 * 1024 },
 };
 
 const Schema = z.object({
@@ -20,6 +21,7 @@ const Schema = z.object({
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (session.user.tier === "guest") return NextResponse.json({ error: "Upgrade required" }, { status: 403 });
 
   const body = await req.json();
   const parsed = Schema.safeParse(body);

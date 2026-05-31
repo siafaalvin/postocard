@@ -25,6 +25,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   const { id: postId } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (session.user.tier === "guest") return NextResponse.json({ error: "Upgrade required" }, { status: 403 });
 
   const body = await req.json();
   const parsed = Schema.safeParse(body);
@@ -59,6 +60,12 @@ export async function POST(req: NextRequest, { params }: Params) {
       },
     }),
   ]);
+
+  if (post.authorId !== session.user.id) {
+    prisma.notification.create({
+      data: { recipientId: post.authorId, actorId: session.user.id, type: "post_commented", postId, commentId: comment.id },
+    }).catch(console.error);
+  }
 
   return NextResponse.json(comment, { status: 201 });
 }

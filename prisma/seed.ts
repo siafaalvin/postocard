@@ -55,6 +55,9 @@ const iphoneExif = { Make: 'Apple', Model: 'iPhone 15 Pro', DateTime: '2026:05:0
 const samsungExif = { Make: 'Samsung', Model: 'Galaxy S24 Ultra', DateTime: '2026:05:04 14:15:00' }
 const screenshotMeta = {} // no Make/Model → hasCamera: false
 
+// Placeholder image URLs (passed through directly — no S3 presign needed)
+const img = (seed: number) => `https://picsum.photos/seed/${seed}/800/800`
+
 // NYC-area coordinates for geotagged posts
 const nyc = { lat: 40.7128, lng: -74.006 }
 const brooklyn = { lat: 40.6782, lng: -73.9442 }
@@ -154,7 +157,7 @@ async function main() {
       data: {
         authorId: alice.id,
         type: PostType.image,
-        mediaKey: 'posts/alice/brooklyn-bridge.jpg',
+        mediaKey: img(101),
         caption: 'Golden hour at the Brooklyn Bridge. One of those shots you wait all year for.',
         ...nyc,
         visibility: PostVisibility.public,
@@ -168,7 +171,7 @@ async function main() {
       data: {
         authorId: alice.id,
         type: PostType.image,
-        mediaKey: 'posts/alice/screenshot-inspo.jpg',
+        mediaKey: img(102),
         caption: 'Saved this color palette from a design blog.',
         visibility: PostVisibility.public,
         likeCount: 0,
@@ -195,7 +198,7 @@ async function main() {
       data: {
         authorId: bob.id,
         type: PostType.image,
-        mediaKey: 'posts/bob/central-park-fall.jpg',
+        mediaKey: img(201),
         caption: 'Central Park in peak autumn. No filter.',
         ...manhattan,
         visibility: PostVisibility.public,
@@ -209,7 +212,7 @@ async function main() {
       data: {
         authorId: bob.id,
         type: PostType.image,
-        mediaKey: 'posts/bob/ramen-spot.jpg',
+        mediaKey: img(202),
         caption: 'Found this tiny ramen place on the Lower East Side. Broth was unreal.',
         visibility: PostVisibility.public,
         likeCount: 1, // alice
@@ -221,12 +224,12 @@ async function main() {
     prisma.post.create({
       data: {
         authorId: bob.id,
-        type: PostType.video,
-        mediaKey: 'posts/bob/timelapse-sunset.mp4',
+        type: PostType.image,
+        mediaKey: img(203),
         caption: 'Rooftop timelapse — 45 minutes compressed to 15 seconds.',
         visibility: PostVisibility.public,
         likeCount: 0,
-        hasCamera: true, // videos always pass camera-only filter
+        hasCamera: true,
         createdAt: daysAgo(4),
       },
     }),
@@ -234,7 +237,7 @@ async function main() {
       data: {
         authorId: bob.id,
         type: PostType.image,
-        mediaKey: 'posts/bob/notes-screenshot.jpg',
+        mediaKey: img(204),
         caption: 'My packing list for the Tokyo trip.',
         visibility: PostVisibility.followers,
         likeCount: 0,
@@ -251,7 +254,7 @@ async function main() {
       data: {
         authorId: carol.id,
         type: PostType.image,
-        mediaKey: 'posts/carol/coffee-morning.jpg',
+        mediaKey: img(301),
         caption: 'Morning ritual.',
         ...brooklyn,
         visibility: PostVisibility.public,
@@ -289,7 +292,7 @@ async function main() {
       data: {
         authorId: dave.id,
         type: PostType.image,
-        mediaKey: 'posts/dave/bookshelf.jpg',
+        mediaKey: img(401),
         caption: 'Current TBR pile.',
         visibility: PostVisibility.public,
         likeCount: 0,
@@ -306,7 +309,7 @@ async function main() {
       data: {
         authorId: eve.id,
         type: PostType.image,
-        mediaKey: 'posts/eve/hudson-yards.jpg',
+        mediaKey: img(501),
         caption: 'The Vessel at golden hour. NYC never gets old.',
         lat: 40.7535,
         lng: -74.0027,
