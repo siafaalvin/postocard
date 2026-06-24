@@ -23,7 +23,7 @@ export function MapView() {
 
     async function initMap() {
       const maplibre = await import("maplibre-gl");
-      await import("maplibre-gl/dist/maplibre-gl.css");
+      // CSS loaded via link tag in layout
 
       if (!mapRef.current) return;
 

@@ -55,10 +55,10 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.username = (user as { username: string }).username;
-        token.displayName = (user as { displayName: string }).displayName;
-        token.avatarUrl = (user as { avatarUrl: string | null }).avatarUrl;
-        token.tier = (user as { tier: string }).tier;
+        token.username = (user as unknown as { username: string }).username;
+        token.displayName = (user as unknown as { displayName: string }).displayName;
+        token.avatarUrl = (user as unknown as { avatarUrl: string | null }).avatarUrl;
+        token.tier = (user as unknown as { tier: string }).tier;
       }
       return token;
     },

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { removePublicFlag } from "@/lib/flags";
 import type Stripe from "stripe";
 
-export const config = { api: { bodyParser: false } };
+// Body parsing handled by req.text() in App Router
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
