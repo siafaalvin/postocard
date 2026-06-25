@@ -7,7 +7,7 @@ export default function LandingPage() {
       {/* Header */}
       <header className="border-b border-neutral-200 dark:border-neutral-800">
         <div className="mx-auto flex max-w-xl items-center justify-between px-4 py-4">
-          <span className="text-xl font-bold tracking-tight">Postocard</span>
+          <span className="site-title text-xl">Postocard</span>
           <div className="flex gap-2">
             <Link
               href="/login"
