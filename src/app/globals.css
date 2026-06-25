@@ -1,39 +1,21 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Limelight&display=swap');
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Custom palette */
 @theme {
-  --color-neutral-50: #F4EFEB;
-  --color-neutral-100: #EAE6DF;
-  --color-neutral-200: #D5D0C9;
-  --color-neutral-300: #B8B3AC;
-  --color-neutral-400: #8A857E;
-  --color-neutral-500: #5C5753;
-  --color-neutral-600: #4A4643;
-  --color-neutral-700: #3B3835;
-  --color-neutral-800: #2E2D2A;
-  --color-neutral-900: #232220;
-  --color-neutral-950: #1A1918;
-  --color-red-500: #D4563E;
-  --color-red-600: #C84B31;
-  --color-red-700: #A83D28;
+  --color-brand: #C84B31;
+  --color-brand-dark: #D9B536;
 }
 
-/* Light mode */
 :root {
   --background: #EAE6DF;
   --foreground: #2E2D2A;
-  --accent: #C84B31;
   --heading: #C84B31;
 }
 
-/* Dark mode (class-based) */
 :root.dark {
   --background: #2E2D2A;
   --foreground: #F4EFEB;
-  --accent: #D9B536;
   --heading: #D9B536;
 }
 
@@ -49,17 +31,12 @@ h1, h2, h3 {
   color: var(--heading);
 }
 
-/* Site title — all caps Limelight */
 .site-title {
   font-family: 'Limelight', cursive;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  color: var(--heading);
 }
 
-* {
-  box-sizing: border-box;
-}
-
-.feed-scroll {
-  scroll-behavior: smooth;
-}
+* { box-sizing: border-box; }
+.feed-scroll { scroll-behavior: smooth; }
