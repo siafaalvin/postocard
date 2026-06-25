@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
@@ -52,10 +53,12 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-neutral-200 bg-neutral-50/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/90">
       <div className="mx-auto flex max-w-xl items-center justify-between px-4 py-3">
-        <Link href="/feed" className="text-lg font-bold tracking-tight">
+        <Link href="/feed" className="site-title text-lg">
           Postocard
         </Link>
 
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
         <nav className="flex items-center gap-1">
           {/* Feed / Top / Map — desktop only */}
           <div className="hidden md:flex items-center gap-1">
@@ -162,6 +165,7 @@ export function Navbar() {
             </>
           )}
         </nav>
+        </div>
       </div>
     </header>
   );
