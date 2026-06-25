@@ -2,11 +2,6 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
-  --color-brand: #C84B31;
-  --color-brand-dark: #D9B536;
-}
-
 :root {
   --background: #EAE6DF;
   --foreground: #2E2D2A;
