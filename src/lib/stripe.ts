@@ -1,17 +1,30 @@
 import Stripe from "stripe";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-02-25.clover",
+let _stripe: Stripe | null = null;
+
+export function getStripe(): Stripe {
+  if (!_stripe) {
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: "2026-02-25.clover",
+    });
+  }
+  return _stripe;
+}
+
+/** @deprecated Use getStripe() instead */
+export const stripe = new Proxy({} as Stripe, {
+  get(_, prop) {
+    return (getStripe() as any)[prop];
+  },
 });
 
 export const PRICES = {
-  registration: 100,      // $1.00 in cents
-  plus: 500,              // $5.00
-  creator: 2000,          // $20.00
-  viewExtension: 100,     // $1.00
-  // Flag removal: escalates per offense (1st–4th; no removal after 4th)
-  flagRemoval1: 100,      // $1.00
-  flagRemoval2: 1000,     // $10.00
-  flagRemoval3: 10000,    // $100.00
-  flagRemoval4: 100000,   // $1,000.00
+  registration: 100,
+  plus: 500,
+  creator: 2000,
+  viewExtension: 100,
+  flagRemoval1: 100,
+  flagRemoval2: 1000,
+  flagRemoval3: 10000,
+  flagRemoval4: 100000,
 } as const;
