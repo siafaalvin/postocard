@@ -14,7 +14,6 @@ interface User {
   displayName: string;
   avatarUrl?: string | null;
   bio?: string | null;
-  konvoId?: string | null;
   visibility: string;
   _count: { posts: number; followers: number; following: number };
 }
@@ -77,16 +76,6 @@ export function ProfileView({ user, viewerId, blockContext }: Props) {
           </div>
           <p className="text-neutral-500">@{user.username}</p>
           {user.bio && <p className="mt-2 text-sm">{user.bio}</p>}
-          {user.konvoId && (
-            <a
-              href={`https://housecall.app/u/${user.konvoId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 block text-sm text-neutral-500 hover:underline"
-            >
-              Housecall: {user.konvoId}
-            </a>
-          )}
 
           <div className="mt-3 flex gap-4 text-sm">
             <span><strong>{user._count.posts}</strong> posts</span>

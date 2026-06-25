@@ -19,7 +19,6 @@ interface User {
   visibility: string;
   tier: string;
   zipCode: string | null;
-  konvoId: string | null;
   registrationPaidAt: Date | null;
   renewalDueAt: Date | null;
   alternateNames: { id: string; name: string; slot: number }[];

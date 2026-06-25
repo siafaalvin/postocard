@@ -19,7 +19,6 @@ interface User {
   displayName: string;
   bio?: string | null;
   zipCode?: string | null;
-  konvoId?: string | null;
   avatarUrl?: string | null;
   visibility: string;
   tier: string;
@@ -40,7 +39,6 @@ export function AccountSettings({ user }: { user: User }) {
     displayName: user.displayName,
     bio: user.bio ?? "",
     zipCode: user.zipCode ?? "",
-    konvoId: user.konvoId ?? "",
     visibility: user.visibility as "public" | "private",
   });
   const [saving, setSaving] = useState(false);
@@ -116,7 +114,6 @@ export function AccountSettings({ user }: { user: User }) {
       <form onSubmit={handleSave} className="flex flex-col gap-4">
         <h2 className="font-semibold">Profile</h2>
         <Input label="Display name" value={form.displayName} onChange={set("displayName")} maxLength={50} />
-        <Input label="Housecall ID" value={form.konvoId} onChange={set("konvoId")} placeholder="Your Housecall public ID" />
         <Input label="Zip / Postal Code" value={form.zipCode} onChange={set("zipCode")} maxLength={10} placeholder="Not shown publicly" />
         <div>
           <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Bio</label>
