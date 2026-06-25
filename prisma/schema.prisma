@@ -82,6 +82,7 @@ model User {
   cameraOnlyMode  Boolean        @default(false)
   statusOnlyMode  Boolean        @default(false)
   registrationPaidAt DateTime?
+  konvoUserId        String?          @unique
   renewalDueAt       DateTime?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt

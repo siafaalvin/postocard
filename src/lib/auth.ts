@@ -2,6 +2,8 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { compare } from "bcryptjs";
+import { verifyKonvoCredentials } from "@/lib/konvo-auth";
+import { hash } from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
@@ -19,6 +21,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        // Try local Postocard credentials first
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
           select: {
@@ -33,20 +36,47 @@ export const authOptions: NextAuthOptions = {
           },
         });
 
-        if (!user) return null;
+        if (user) {
+          const valid = await compare(credentials.password, user.passwordHash);
+          if (!valid) return null;
+          if (!user.registrationPaidAt) return null;
+          return {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            displayName: user.displayName,
+            avatarUrl: user.avatarUrl ?? null,
+            tier: user.tier,
+          };
+        }
 
-        const valid = await compare(credentials.password, user.passwordHash);
-        if (!valid) return null;
+        // Fallback: try Konvo credentials — registered Konvo users get free access
+        const konvo = await verifyKonvoCredentials(credentials.email, credentials.password);
+        if (!konvo.success || !konvo.email) return null;
 
-        if (!user.registrationPaidAt) return null; // must have paid to log in
+        // Auto-provision a Postocard account for this Konvo user
+        const username = konvo.email.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "_").slice(0, 20);
+        const newUser = await prisma.user.upsert({
+          where: { email: konvo.email },
+          update: { registrationPaidAt: new Date() },
+          create: {
+            email: konvo.email,
+            username: username + "_" + Date.now().toString(36).slice(-4),
+            displayName: username,
+            passwordHash: await hash(credentials.password, 12),
+            tier: "basic",
+            registrationPaidAt: new Date(),
+            konvoUserId: konvo.konvoUserId ?? null,
+          },
+        });
 
         return {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          displayName: user.displayName,
-          avatarUrl: user.avatarUrl ?? null,
-          tier: user.tier,
+          id: newUser.id,
+          email: newUser.email,
+          username: newUser.username,
+          displayName: newUser.displayName,
+          avatarUrl: newUser.avatarUrl ?? null,
+          tier: newUser.tier,
         };
       },
     }),
