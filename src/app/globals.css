@@ -1,38 +1,39 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Limelight&display=swap');
 
-/* Nord palette — remap neutral scale and red scale */
+/* Custom palette */
 @theme {
-  /* Snow Storm (light backgrounds / light text in dark mode) */
-  --color-neutral-50: #ECEFF4;
-  --color-neutral-100: #E5E9F0;
-  --color-neutral-200: #D8DEE9;
-  --color-neutral-300: #C0CADE;
-  --color-neutral-400: #93A4BD;
-  --color-neutral-500: #677D96;
-  /* Polar Night (dark backgrounds / dark text in light mode) */
-  --color-neutral-600: #4C566A;
-  --color-neutral-700: #434C5E;
-  --color-neutral-800: #3B4252;
-  --color-neutral-900: #2E3440;
-  --color-neutral-950: #252B38;
-  /* Aurora red */
-  --color-red-500: #C4717A;
-  --color-red-600: #BF616A;
-  --color-red-700: #A5535C;
+  --color-neutral-50: #F4EFEB;
+  --color-neutral-100: #EAE6DF;
+  --color-neutral-200: #D5D0C9;
+  --color-neutral-300: #B8B3AC;
+  --color-neutral-400: #8A857E;
+  --color-neutral-500: #5C5753;
+  --color-neutral-600: #4A4643;
+  --color-neutral-700: #3B3835;
+  --color-neutral-800: #2E2D2A;
+  --color-neutral-900: #232220;
+  --color-neutral-950: #1A1918;
+  --color-red-500: #D4563E;
+  --color-red-600: #C84B31;
+  --color-red-700: #A83D28;
 }
 
-/* Nord Light / Nord Dark semantic tokens */
+/* Light mode */
 :root {
-  --background: #ECEFF4;
-  --foreground: #2E3440;
-  --accent: #BF616A;
+  --background: #EAE6DF;
+  --foreground: #2E2D2A;
+  --accent: #C84B31;
+  --heading: #C84B31;
 }
 
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #2E3440;
-    --foreground: #ECEFF4;
-    --accent: #A3BE8C;
+    --background: #2E2D2A;
+    --foreground: #F4EFEB;
+    --accent: #D9B536;
+    --heading: #D9B536;
   }
 }
 
@@ -42,11 +43,15 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+h1, h2, h3 {
+  font-family: 'Limelight', cursive;
+  color: var(--heading);
+}
+
 * {
   box-sizing: border-box;
 }
 
-/* Feed scroll snap feel */
 .feed-scroll {
   scroll-behavior: smooth;
 }
