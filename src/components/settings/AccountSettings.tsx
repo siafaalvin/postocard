@@ -109,10 +109,22 @@ export function AccountSettings({ user }: { user: User }) {
     }
   }
 
+  const [darkMode, setDarkMode] = useState(() => typeof window !== "undefined" ? document.documentElement.classList.contains("dark") : false);
+  function toggleDarkMode() { const n = !darkMode; setDarkMode(n); document.documentElement.classList.toggle("dark", n); localStorage.setItem("postocard-theme", n ? "dark" : "light"); }
+
   return (
     <div className="flex flex-col gap-8">
       <form onSubmit={handleSave} className="flex flex-col gap-4">
         <h2 className="font-semibold">Profile</h2>
+        <div className="flex items-center justify-between py-3 border-b border-neutral-200 dark:border-neutral-700 mb-4">
+          <div>
+            <p className="text-sm font-medium">Dark Mode</p>
+            <p className="text-xs text-neutral-500">Switch between light and dark theme</p>
+          </div>
+          <button type="button" onClick={toggleDarkMode} className={"px-3 py-1 rounded-full text-xs font-medium " + (darkMode ? "bg-neutral-700 text-white" : "bg-neutral-200 text-neutral-700")}>
+            {darkMode ? "Dark" : "Light"}
+          </button>
+        </div>
         <Input label="Display name" value={form.displayName} onChange={set("displayName")} maxLength={50} />
         <Input label="Zip / Postal Code" value={form.zipCode} onChange={set("zipCode")} maxLength={10} placeholder="Not shown publicly" />
         <div>

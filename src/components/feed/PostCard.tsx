@@ -96,7 +96,7 @@ export function PostCard({ post, viewerId }: PostCardProps) {
           <Link href={`/${post.author.username}`} className="font-semibold">
             {post.author.username}
           </Link>{" "}
-          {post.caption}
+          <Link href={`/post/${post.id}`} className="hover:underline">{post.caption}</Link>
         </p>
       )}
 
