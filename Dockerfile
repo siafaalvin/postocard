@@ -3,22 +3,22 @@ FROM node:22-alpine AS base
 RUN apk add --no-cache libc6-compat openssl
 RUN npm install -g bun
 
-# --- deps ---
+# --- deps (cached until package.json changes) ---
 FROM base AS deps
 WORKDIR /app
 COPY package.json bun.lock* ./
 COPY prisma ./prisma/
 RUN bun install --frozen-lockfile
 
-# --- build ---
+# --- build (NEVER cached - buildstamp forces fresh build every deploy) ---
 FROM base AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
-ARG CACHEBUST=10
+RUN echo "build:$(date +%s)" > .buildstamp
 COPY . .
 RUN bunx prisma generate
-RUN bun run build && rm -rf .next/server/app/**/*.html .next/server/app/**/*.rsc
+RUN bun run build
 
 # --- runner ---
 FROM base AS runner
