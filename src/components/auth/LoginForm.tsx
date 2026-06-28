@@ -10,6 +10,7 @@ export function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -45,12 +46,13 @@ export function LoginForm() {
       />
       <Input
         label="Password"
-        type="password"
+        type={showPw ? "text" : "password"}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
         autoComplete="current-password"
       />
+      <button type="button" onClick={() => setShowPw(!showPw)} className="text-xs text-neutral-500 mt-1 hover:text-neutral-700">{showPw ? "Hide password" : "Show password"}</button>
       {error && <p className="text-sm text-red-500">{error}</p>}
       <Button type="submit" loading={loading}>
         Log in
