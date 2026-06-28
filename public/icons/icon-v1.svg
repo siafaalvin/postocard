@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#FFFFFF" rx="80"/>
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#2E2D2A" stroke-width="4"/>
+  <circle cx="256" cy="256" r="170" fill="none" stroke="#2E2D2A" stroke-width="1.5"/>
+  <path d="M 60,200 Q 90,190 120,200 Q 150,210 180,200 Q 210,190 240,200 Q 270,210 300,200 Q 330,190 360,200 Q 390,210 420,200 Q 450,190 452,200" fill="none" stroke="#2E2D2A" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 60,230 Q 90,220 120,230 Q 150,240 180,230 Q 210,220 240,230 Q 270,240 300,230 Q 330,220 360,230 Q 390,240 420,230 Q 450,220 452,230" fill="none" stroke="#2E2D2A" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 60,282 Q 90,272 120,282 Q 150,292 180,282 Q 210,272 240,282 Q 270,292 300,282 Q 330,272 360,282 Q 390,292 420,282 Q 450,272 452,282" fill="none" stroke="#2E2D2A" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 60,312 Q 90,302 120,312 Q 150,322 180,312 Q 210,302 240,312 Q 270,322 300,312 Q 330,302 360,312 Q 390,322 420,312 Q 450,302 452,312" fill="none" stroke="#2E2D2A" stroke-width="3.5" stroke-linecap="round"/>
+  <text x="256" y="310" font-family="Georgia, serif" font-weight="700" font-size="200" fill="#C84B31" text-anchor="middle" letter-spacing="-5">P</text>
+</svg>

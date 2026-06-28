@@ -1,4 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Red background -->
   <rect width="512" height="512" fill="#C84B31" rx="80"/>
-  <text x="256" y="340" font-family="system-ui, sans-serif" font-weight="700" font-size="220" fill="#EAE6DF" text-anchor="middle">P</text>
+  
+  <!-- Circle - fills most of icon, 3px from edge = radius ~250, center 256 -->
+  <circle cx="256" cy="256" r="245" fill="none" stroke="#EAE6DF" stroke-width="6"/>
+  <circle cx="256" cy="256" r="233" fill="none" stroke="#EAE6DF" stroke-width="3.5"/>
+  
+  <!-- Four wavy cancellation lines - equidistant (spacing ~50px apart, centered at 256) -->
+  <!-- Line 1: y=181 -->
+  <path d="M 30,181 Q 65,168 100,181 Q 135,194 170,181 Q 205,168 240,181 Q 275,194 310,181 Q 345,168 380,181 Q 415,194 450,181 Q 480,168 482,181" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Line 2: y=231 -->
+  <path d="M 30,231 Q 65,218 100,231 Q 135,244 170,231 Q 205,218 240,231 Q 275,244 310,231 Q 345,218 380,231 Q 415,244 450,231 Q 480,218 482,231" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Line 3: y=281 -->
+  <path d="M 30,281 Q 65,268 100,281 Q 135,294 170,281 Q 205,268 240,281 Q 275,294 310,281 Q 345,268 380,281 Q 415,294 450,281 Q 480,268 482,281" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Line 4: y=331 -->
+  <path d="M 30,331 Q 65,318 100,331 Q 135,344 170,331 Q 205,318 240,331 Q 275,344 310,331 Q 345,318 380,331 Q 415,344 450,331 Q 480,318 482,331" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+  
+  <!-- Large P filling most of the circle -->
+  <text x="256" y="345" font-family="Georgia, serif" font-weight="700" font-size="320" fill="#EAE6DF" text-anchor="middle">P</text>
 </svg>

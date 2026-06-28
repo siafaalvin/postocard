@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Limelight&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; }
+body { width: 512px; height: 512px; overflow: hidden; }
+.icon {
+  width: 512px;
+  height: 512px;
+  position: relative;
+  background: #C84B31;
+  border-radius: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.letter {
+  position: relative;
+  font-family: 'Limelight', cursive;
+  font-size: 400px;
+  font-weight: 400;
+  color: #EAE6DF;
+  z-index: 3;
+  margin-top: -10px;
+}
+</style>
+</head>
+<body>
+<div class="icon">
+  <svg viewBox="0 0 512 512" style="z-index:1;">
+    <circle cx="256" cy="256" r="245" fill="none" stroke="#EAE6DF" stroke-width="5"/>
+    <circle cx="256" cy="256" r="230" fill="none" stroke="#EAE6DF" stroke-width="8"/>
+    <!-- 3 wavy lines: from left inner circle (~x=30) to 1px past P's right shaft (~x=232) -->
+    <path d="M 30,213 Q 55,200 80,213 Q 105,226 130,213 Q 155,200 180,213 Q 205,226 232,213" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 30,256 Q 55,243 80,256 Q 105,269 130,256 Q 155,243 180,256 Q 205,269 232,256" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 30,299 Q 55,286 80,299 Q 105,312 130,299 Q 155,286 180,299 Q 205,312 232,299" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+  </svg>
+  
+  <!-- Red lines on top where they cross the P -->
+  <svg viewBox="0 0 512 512" style="z-index:4; pointer-events:none;">
+    <defs>
+      <clipPath id="p-clip">
+        <text x="256" y="355" font-family="Limelight, cursive" font-size="400" font-weight="400" text-anchor="middle">P</text>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#p-clip)">
+      <path d="M 30,213 Q 55,200 80,213 Q 105,226 130,213 Q 155,200 180,213 Q 205,226 232,213" fill="none" stroke="#C84B31" stroke-width="4" stroke-linecap="round"/>
+      <path d="M 30,256 Q 55,243 80,256 Q 105,269 130,256 Q 155,243 180,256 Q 205,269 232,256" fill="none" stroke="#C84B31" stroke-width="4" stroke-linecap="round"/>
+      <path d="M 30,299 Q 55,286 80,299 Q 105,312 130,299 Q 155,286 180,299 Q 205,312 232,299" fill="none" stroke="#C84B31" stroke-width="4" stroke-linecap="round"/>
+    </g>
+  </svg>
+  
+  <span class="letter">P</span>
+</div>
+<script>document.fonts.ready.then(() => {});</script>
+</body>
+</html>

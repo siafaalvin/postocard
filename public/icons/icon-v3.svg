@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Red background -->
+  <rect width="512" height="512" fill="#C84B31" rx="80"/>
+  
+  <!-- Outer circle: thicker than before but thinner than inner (5px) -->
+  <circle cx="256" cy="256" r="245" fill="none" stroke="#EAE6DF" stroke-width="5"/>
+  <!-- Inner circle: thickest (8px) -->
+  <circle cx="256" cy="256" r="230" fill="none" stroke="#EAE6DF" stroke-width="8"/>
+  
+  <!-- 3 wavy lines - equidistant, shortened (2px gap from inner circle = stay within r=220) -->
+  <!-- Lines span from x=50 to x=462 (within inner circle diameter ~460) -->
+  <path d="M 50,213 Q 85,200 120,213 Q 155,226 190,213 Q 225,200 260,213 Q 295,226 330,213 Q 365,200 400,213 Q 435,226 462,213" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 50,256 Q 85,243 120,256 Q 155,269 190,256 Q 225,243 260,256 Q 295,269 330,256 Q 365,243 400,256 Q 435,269 462,256" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 50,299 Q 85,286 120,299 Q 155,312 190,299 Q 225,286 260,299 Q 295,312 330,299 Q 365,286 400,299 Q 435,312 462,299" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+  
+  <!-- Large P in Limelight style (Art Deco geometric) -->
+  <text x="256" y="350" font-family="Limelight, Georgia, serif" font-weight="400" font-size="330" fill="#EAE6DF" text-anchor="middle">P</text>
+</svg>

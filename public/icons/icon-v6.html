@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Limelight&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; }
+body { width: 512px; height: 512px; overflow: hidden; }
+.icon {
+  width: 512px;
+  height: 512px;
+  position: relative;
+  background: #C84B31;
+  border-radius: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.letter {
+  position: relative;
+  font-family: 'Limelight', cursive;
+  font-size: 400px;
+  font-weight: 400;
+  color: #EAE6DF;
+  z-index: 2;
+  margin-top: -10px;
+  /* Create knockout effect: lines behind P turn red */
+  text-shadow: none;
+}
+</style>
+</head>
+<body>
+<div class="icon">
+  <!-- Background layer: circles + white wavy lines (full width of inner circle) -->
+  <svg viewBox="0 0 512 512" style="z-index:1;">
+    <circle cx="256" cy="256" r="245" fill="none" stroke="#EAE6DF" stroke-width="5"/>
+    <circle cx="256" cy="256" r="230" fill="none" stroke="#EAE6DF" stroke-width="8"/>
+    <!-- 3 wavy lines spanning inner circle diameter (x=30 to x=482) -->
+    <path d="M 30,213 Q 60,200 90,213 Q 120,226 150,213 Q 180,200 210,213 Q 240,226 270,213 Q 300,200 330,213 Q 360,226 390,213 Q 420,200 450,213 Q 475,222 482,213" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 30,256 Q 60,243 90,256 Q 120,269 150,256 Q 180,243 210,256 Q 240,269 270,256 Q 300,243 330,256 Q 360,269 390,256 Q 420,243 450,256 Q 475,265 482,256" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 30,299 Q 60,286 90,299 Q 120,312 150,299 Q 180,286 210,299 Q 240,312 270,299 Q 300,286 330,299 Q 360,312 390,299 Q 420,286 450,299 Q 475,308 482,299" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+  </svg>
+  
+  <!-- P layer with solid background to mask white lines, then red lines on top -->
+  <div style="position:absolute; z-index:3; display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
+    <span class="letter">P</span>
+  </div>
+  
+  <!-- Red wavy lines layer on top - only visible where they overlap the P (clipped to P shape) -->
+  <svg viewBox="0 0 512 512" style="z-index:4; pointer-events:none;">
+    <defs>
+      <clipPath id="p-clip">
+        <text x="256" y="355" font-family="Limelight, cursive" font-size="400" font-weight="400" text-anchor="middle">P</text>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#p-clip)">
+      <path d="M 30,213 Q 60,200 90,213 Q 120,226 150,213 Q 180,200 210,213 Q 240,226 270,213 Q 300,200 330,213 Q 360,226 390,213 Q 420,200 450,213 Q 475,222 482,213" fill="none" stroke="#C84B31" stroke-width="4" stroke-linecap="round"/>
+      <path d="M 30,256 Q 60,243 90,256 Q 120,269 150,256 Q 180,243 210,256 Q 240,269 270,256 Q 300,243 330,256 Q 360,269 390,256 Q 420,243 450,256 Q 475,265 482,256" fill="none" stroke="#C84B31" stroke-width="4" stroke-linecap="round"/>
+      <path d="M 30,299 Q 60,286 90,299 Q 120,312 150,299 Q 180,286 210,299 Q 240,312 270,299 Q 300,286 330,299 Q 360,312 390,299 Q 420,286 450,299 Q 475,308 482,299" fill="none" stroke="#C84B31" stroke-width="4" stroke-linecap="round"/>
+    </g>
+  </svg>
+</div>
+<script>document.fonts.ready.then(() => {});</script>
+</body>
+</html>

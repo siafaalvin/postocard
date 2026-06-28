@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Limelight&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; }
+body { width: 512px; height: 512px; overflow: hidden; }
+.icon {
+  width: 512px;
+  height: 512px;
+  position: relative;
+  background: #C84B31;
+  border-radius: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+svg { position: absolute; top: 0; left: 0; }
+.letter {
+  position: relative;
+  font-family: 'Limelight', cursive;
+  font-size: 330px;
+  font-weight: 400;
+  color: #EAE6DF;
+  z-index: 2;
+  margin-top: -10px;
+}
+</style>
+</head>
+<body>
+<div class="icon">
+  <svg width="512" height="512" viewBox="0 0 512 512">
+    <circle cx="256" cy="256" r="245" fill="none" stroke="#EAE6DF" stroke-width="5"/>
+    <circle cx="256" cy="256" r="230" fill="none" stroke="#EAE6DF" stroke-width="8"/>
+    <path d="M 50,213 Q 75,200 100,213 Q 125,226 150,213 Q 175,200 200,213 Q 215,220 215,213" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 50,256 Q 75,243 100,256 Q 125,269 150,256 Q 175,243 200,256 Q 215,263 215,256" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 50,299 Q 75,286 100,299 Q 125,312 150,299 Q 175,286 200,299 Q 215,306 215,299" fill="none" stroke="#EAE6DF" stroke-width="3.5" stroke-linecap="round"/>
+  </svg>
+  <span class="letter">P</span>
+</div>
+<script>
+// Wait for font to load before signaling ready
+document.fonts.ready.then(() => {
+  document.body.dataset.fontsLoaded = 'true';
+});
+</script>
+</body>
+</html>
