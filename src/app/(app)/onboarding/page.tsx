@@ -26,7 +26,7 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (username.length < 3) { setAvailable(null); return; }
     const timer = setTimeout(async () => {
-      const res = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username)}`);
+      const res = await fetch(`/api/username/check?username=${encodeURIComponent(username)}`);
       const data = await res.json();
       setAvailable(data.available);
       setReason(data.reason || "");
