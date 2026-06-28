@@ -15,10 +15,10 @@ FROM base AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
-ARG CACHEBUST=9
+ARG CACHEBUST=10
 COPY . .
 RUN bunx prisma generate
-RUN bun run build
+RUN bun run build && rm -rf .next/server/app/**/*.html .next/server/app/**/*.rsc
 
 # --- runner ---
 FROM base AS runner
