@@ -77,6 +77,7 @@ export const authOptions: NextAuthOptions = {
           displayName: newUser.displayName,
           avatarUrl: newUser.avatarUrl ?? null,
           tier: newUser.tier,
+          needsOnboarding: true,
         };
       },
     }),
@@ -89,6 +90,7 @@ export const authOptions: NextAuthOptions = {
         token.displayName = (user as unknown as { displayName: string }).displayName;
         token.avatarUrl = (user as unknown as { avatarUrl: string | null }).avatarUrl;
         token.tier = (user as unknown as { tier: string }).tier;
+        token.needsOnboarding = (user as unknown as { needsOnboarding?: boolean }).needsOnboarding ?? false;
       }
       return token;
     },
@@ -99,6 +101,7 @@ export const authOptions: NextAuthOptions = {
         session.user.displayName = token.displayName as string;
         session.user.avatarUrl = (token.avatarUrl as string | null) ?? null;
         session.user.tier = token.tier as string;
+        session.user.needsOnboarding = token.needsOnboarding as boolean ?? false;
       }
       return session;
     },
@@ -114,6 +117,7 @@ declare module "next-auth" {
       displayName: string;
       avatarUrl: string | null;
       tier: string;
+      needsOnboarding: boolean;
     };
   }
 }

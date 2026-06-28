@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+import { OnboardingGuard } from "@/components/OnboardingGuard";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
@@ -13,7 +14,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
       <Navbar />
-      <main className="mx-auto max-w-xl px-4 py-6 pb-20 md:pb-6">{children}</main>
+      <main className="mx-auto max-w-xl px-4 py-6 pb-20 md:pb-6"><OnboardingGuard>{children}</OnboardingGuard></main>
       <BottomNav />
       <NewPostFAB />
     </div>
