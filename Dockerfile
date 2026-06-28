@@ -15,7 +15,7 @@ FROM base AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
-ARG CACHEBUST=6
+ARG CACHEBUST=7
 COPY . .
 RUN bunx prisma generate
 RUN bun run build
