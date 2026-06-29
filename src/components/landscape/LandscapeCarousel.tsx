@@ -32,10 +32,18 @@ export function LandscapeCarousel({ posts, userId }: Props) {
     await fetch(`/api/posts/${postId}/like`, { method: isLiked ? "DELETE" : "POST" }).catch(() => {});
   }
 
+  if (posts.length === 0) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
+        <p className="text-white/50 text-sm">Loading posts...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="fixed inset-0 z-50 bg-black overflow-y-auto snap-y snap-mandatory">
+    <div className="fixed inset-0 z-50 bg-black overflow-y-auto snap-y snap-mandatory" style={{WebkitOverflowScrolling: "touch"}}>
       {posts.map(post => (
-        <div key={post.id} className="w-screen h-screen snap-center relative">
+        <div key={post.id} className="w-screen h-[100dvh] snap-center relative flex-shrink-0">
           <LandscapePostCard post={post} />
           <LandscapeOverlay
             author={post.author}

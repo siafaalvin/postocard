@@ -35,6 +35,8 @@ interface Props {
 export function MainFeed({ userId, initialCapacity }: Props) {
   const [filter, setFilter] = useState<Filter>("all");
   const isLandscape = useOrientation();
+  const [carouselMode, setCarouselMode] = useState(false);
+  const showCarousel = isLandscape || carouselMode;
     const [posts, setPosts] = useState<Post[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -116,11 +118,20 @@ export function MainFeed({ userId, initialCapacity }: Props) {
         </p>
       )}
 
-      {isLandscape && posts.length > 0 && (
+      {!isLandscape && (
+        <button
+          onClick={() => setCarouselMode(!carouselMode)}
+          className="hidden md:flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 dark:hover:text-white mb-3 px-2 py-1 rounded-md border border-neutral-200 dark:border-neutral-700"
+        >
+          {carouselMode ? "⊞ Grid View" : "▶ Carousel View"}
+        </button>
+      )}
+
+      {showCarousel && posts.length > 0 && (
         <LandscapeCarousel posts={posts} userId={userId} />
       )}
 
-      {!isLandscape && posts.map((post) => (
+      {!showCarousel && posts.map((post) => (
         <PostCard key={post.id} post={post} viewerId={userId} />
       ))}
 
