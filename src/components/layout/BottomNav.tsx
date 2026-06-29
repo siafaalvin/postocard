@@ -23,7 +23,7 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="flex md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-neutral-200 bg-neutral-50/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/90">
+    <nav data-bottomnav className="flex md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-neutral-200 bg-neutral-50/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/90">
       {TABS.map(({ href, icon: Icon, label }) => (
         <Link
           key={href}

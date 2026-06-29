@@ -72,7 +72,7 @@ export function FeedTabs({ userId, tier, initialCapacity }: Props) {
   return (
     <div>
       {/* Tab bar — sticky under navbar */}
-      <div className="sticky top-14 z-40 flex border-b border-neutral-200 bg-white/95 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95">
+      <div data-feedtabs="" className="sticky top-14 z-40 flex border-b border-neutral-200 bg-white/95 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95">
         {TABS.map((tab, i) => (
           <button
             key={tab}

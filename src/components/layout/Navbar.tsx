@@ -50,7 +50,7 @@ export function Navbar() {
   const activityActive = pathname === "/feed" && searchParams.get("tab") === "activity";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-neutral-200 bg-neutral-50/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/90">
+    <header data-navbar className="sticky top-0 z-50 border-b border-neutral-200 bg-neutral-50/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/90">
       <div className="mx-auto flex max-w-xl items-center justify-between px-4 py-3">
         <Link href="/feed" className="site-title text-lg">
           Postocard
