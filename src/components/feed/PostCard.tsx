@@ -74,17 +74,17 @@ export function PostCard({ post, viewerId }: PostCardProps) {
       </div>
 
       {/* Media */}
-      {post.type === "image" && post.signedUrl && (
+      {post.type === "image" && (post.signedUrl || post.mediaKey) && (
         <Link href={`/post/${post.id}`}>
           <div className="relative mb-3 aspect-square w-full overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-800">
-            <img src={post.signedUrl} alt={post.caption ?? ""} className="absolute inset-0 w-full h-full object-cover" />
+            <img src={post.signedUrl || `/api/media/${post.mediaKey}`} alt={post.caption ?? ""} className="absolute inset-0 w-full h-full object-cover" />
           </div>
         </Link>
       )}
 
-      {post.type === "video" && post.signedUrl && (
+      {post.type === "video" && (post.signedUrl || post.mediaKey) && (
         <video
-          src={post.signedUrl}
+          src={post.signedUrl || `/api/media/${post.mediaKey}`}
           controls
           muted
           playsInline
