@@ -13,22 +13,34 @@ const s3 = new S3Client({
 
 const BUCKET = process.env.S3_BUCKET!;
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ key: string[] }> }) {
-  const { key } = await params;
-  const mediaKey = key.join("/");
+export async function GET(req: NextRequest) {
+  // Extract key from URL path after /api/media/
+  const url = new URL(req.url);
+  const mediaKey = url.pathname.replace("/api/media/", "");
+
+  if (!mediaKey) {
+    return NextResponse.json({ error: "No key" }, { status: 400 });
+  }
 
   try {
     const res = await s3.send(new GetObjectCommand({ Bucket: BUCKET, Key: mediaKey }));
-    const body = await res.Body?.transformToByteArray();
-    if (!body) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    
+    if (!res.Body) {
+      return NextResponse.json({ error: "Empty body" }, { status: 404 });
+    }
 
-    return new NextResponse(body, {
+    const bytes = await res.Body.transformToByteArray();
+    
+    return new NextResponse(bytes, {
+      status: 200,
       headers: {
-        "Content-Type": res.ContentType ?? "application/octet-stream",
+        "Content-Type": res.ContentType ?? "image/jpeg",
         "Cache-Control": "public, max-age=31536000, immutable",
+        "Content-Length": String(bytes.length),
       },
     });
-  } catch {
+  } catch (e: any) {
+    console.error("Media proxy error:", e.name, e.message);
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 }
