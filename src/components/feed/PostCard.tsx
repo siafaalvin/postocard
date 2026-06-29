@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { Heart, MessageCircle, Link2 } from "lucide-react";
 import { useState } from "react";
 import { Avatar } from "@/components/ui/Avatar";
@@ -78,7 +77,7 @@ export function PostCard({ post, viewerId }: PostCardProps) {
       {post.type === "image" && post.signedUrl && (
         <Link href={`/post/${post.id}`}>
           <div className="relative mb-3 aspect-square w-full overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-800">
-            <Image src={post.signedUrl} alt={post.caption ?? ""} fill className="object-cover" sizes="100vw" />
+            <img src={post.signedUrl} alt={post.caption ?? ""} className="absolute inset-0 w-full h-full object-cover" />
           </div>
         </Link>
       )}

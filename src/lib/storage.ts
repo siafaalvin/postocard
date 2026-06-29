@@ -27,8 +27,8 @@ export async function presignUpload(
 }
 
 export async function presignDownload(key: string, expiresIn = 1800): Promise<string> {
-  const cmd = new GetObjectCommand({ Bucket: BUCKET, Key: key });
-  return getSignedUrl(s3, cmd, { expiresIn });
+  // Serve through our API proxy (MinIO not externally accessible)
+  return `/api/media/${key}`;
 }
 
 export function mediaKey(userId: string, filename: string): string {
