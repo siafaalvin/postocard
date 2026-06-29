@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { PostCard } from "@/components/feed/PostCard";
 import { useOrientation } from "@/components/landscape/useOrientation";
-import { LandscapeCarousel } from "@/components/landscape/LandscapeCarousel";
+import { DesktopCarousel } from "@/components/landscape/DesktopCarousel";
+import { MobileCarousel } from "@/components/landscape/MobileCarousel";
 import { cn } from "@/lib/utils";
 import type { FeedCapacity } from "@/lib/feed";
 
@@ -127,11 +128,17 @@ export function MainFeed({ userId, initialCapacity }: Props) {
         </button>
       )}
 
-      {showCarousel && posts.length > 0 && (
-        <LandscapeCarousel posts={posts} userId={userId} />
+      {/* Desktop carousel overlay */}
+      {carouselMode && !isLandscape && posts.length > 0 && (
+        <DesktopCarousel posts={posts} onClose={() => setCarouselMode(false)} />
       )}
 
-      {!showCarousel && posts.map((post) => (
+      {/* Mobile landscape full-screen takeover */}
+      {isLandscape && posts.length > 0 && (
+        <MobileCarousel posts={posts} />
+      )}
+
+      {!carouselMode && !isLandscape && posts.map((post) => (
         <PostCard key={post.id} post={post} viewerId={userId} />
       ))}
 
