@@ -107,7 +107,7 @@ export function PostForm() {
           if (parsed) mediaMetadata = parsed as Record<string, unknown>;
         }
 
-        await fetch(url, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
+        // Upload handled server-side
       }
 
       const res = await fetch("/api/posts", {
