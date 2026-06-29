@@ -25,7 +25,7 @@ export function DesktopCarousel({ posts, onClose }: Props) {
   const [dragging, setDragging] = useState(false);
   const startX = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const hideTimer = useRef<ReturnType<typeof setTimeout>>();
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const post = posts[index];
   const mediaSrc = post?.signedUrl || (post?.mediaKey ? `/api/media/${post.mediaKey}` : null);
