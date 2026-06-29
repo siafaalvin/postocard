@@ -29,9 +29,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Empty body" }, { status: 404 });
     }
 
-    const bytes = await res.Body.transformToByteArray();
+    const bytes = Buffer.from(await res.Body.transformToByteArray());
     
-    return new NextResponse(bytes, {
+    return new NextResponse(bytes as unknown as BodyInit, {
       status: 200,
       headers: {
         "Content-Type": res.ContentType ?? "image/jpeg",
