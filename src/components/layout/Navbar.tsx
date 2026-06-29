@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
@@ -58,8 +57,7 @@ export function Navbar() {
         </Link>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
-        <nav className="flex items-center gap-1">
+                  <nav className="flex items-center gap-1">
           {/* Feed / Top / Map — desktop only */}
           <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map(({ href, icon: Icon, label }) => (

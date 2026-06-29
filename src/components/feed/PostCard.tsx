@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Heart, MessageCircle, Link2 } from "lucide-react";
 import { useState } from "react";
@@ -46,13 +47,15 @@ export function PostCard({ post, viewerId }: PostCardProps) {
     }
   }
 
+  const router = useRouter();
+
   function copyLink() {
     navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
     setCopied(true);
   }
 
   return (
-    <article className="border-b border-neutral-100 py-4 dark:border-neutral-800">
+    <article onClick={(e) => { if (!(e.target as HTMLElement).closest("a, button")) router.push(`/post/${post.id}`); }} style={{cursor:"pointer"}} className="border-b border-neutral-100 py-4 dark:border-neutral-800">
       {/* Header */}
       <div className="mb-3 flex items-center gap-2">
         <Link href={`/${post.author.username}`}>
@@ -96,7 +99,7 @@ export function PostCard({ post, viewerId }: PostCardProps) {
           <Link href={`/${post.author.username}`} className="font-semibold">
             {post.author.username}
           </Link>{" "}
-          <Link href={`/post/${post.id}`} className="hover:underline">{post.caption}</Link>
+          {post.caption}
         </p>
       )}
 

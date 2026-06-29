@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Heart, MessageCircle, Link2 } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
@@ -45,6 +46,7 @@ interface Props {
 export function PostDetail({ post, viewerId }: Props) {
   const searchParams = useSearchParams();
   const targetCommentId = searchParams.get("c");
+  const router = useRouter();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -94,6 +96,11 @@ export function PostDetail({ post, viewerId }: Props) {
 
   return (
     <div>
+      <button onClick={() => router.back()} className="flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-white mb-4 py-2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back
+      </button>
+      <div>
       {/* Author header */}
       <div className="mb-4 flex items-center gap-3">
         <Link href={`/${post.author.username}`}>
@@ -190,6 +197,7 @@ export function PostDetail({ post, viewerId }: Props) {
       )}
 
       {copied && <Toast message="Link copied!" onDone={() => setCopied(false)} />}
+    </div>
     </div>
   );
 }
