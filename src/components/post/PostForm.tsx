@@ -86,18 +86,19 @@ export function PostForm() {
       let mediaMetadata: Record<string, unknown> | undefined;
 
       if (file && type !== "status") {
+        const uploadForm = new FormData();
+        uploadForm.append("file", file);
         const presignRes = await fetch("/api/posts/presign", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ filename: file.name, contentType: file.type, size: file.size }),
+          body: uploadForm,
         });
 
         if (!presignRes.ok) {
           const d = await presignRes.json();
-          throw new Error(d.error ?? "Failed to get upload URL");
+          throw new Error(d.error ?? "Upload failed");
         }
 
-        const { url, key } = await presignRes.json();
+        const { key } = await presignRes.json();
         mediaKey = key;
 
         if (type === "image") {
@@ -107,7 +108,6 @@ export function PostForm() {
           if (parsed) mediaMetadata = parsed as Record<string, unknown>;
         }
 
-        // Upload handled server-side
       }
 
       const res = await fetch("/api/posts", {
