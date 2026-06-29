@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { PostCard } from "@/components/feed/PostCard";
+import { useOrientation } from "@/components/landscape/useOrientation";
+import { LandscapeCarousel } from "@/components/landscape/LandscapeCarousel";
 import { cn } from "@/lib/utils";
 import type { FeedCapacity } from "@/lib/feed";
 
@@ -32,7 +34,8 @@ interface Props {
 
 export function MainFeed({ userId, initialCapacity }: Props) {
   const [filter, setFilter] = useState<Filter>("all");
-  const [posts, setPosts] = useState<Post[]>([]);
+  const isLandscape = useOrientation();
+    const [posts, setPosts] = useState<Post[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -113,7 +116,11 @@ export function MainFeed({ userId, initialCapacity }: Props) {
         </p>
       )}
 
-      {posts.map((post) => (
+      {isLandscape && posts.length > 0 && (
+        <LandscapeCarousel posts={posts} userId={userId} />
+      )}
+
+      {!isLandscape && posts.map((post) => (
         <PostCard key={post.id} post={post} viewerId={userId} />
       ))}
 
