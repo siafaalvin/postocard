@@ -123,7 +123,7 @@ export function MainFeed({ userId, initialCapacity }: Props) {
           onClick={() => setCarouselMode(!carouselMode)}
           className="hidden md:flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 dark:hover:text-white mb-3 px-2 py-1 rounded-md border border-neutral-200 dark:border-neutral-700"
         >
-          {carouselMode ? "⊞ Grid View" : "▶ Carousel View"}
+          {carouselMode ? "⊞ Timeline View" : "▶ Carousel View"}
         </button>
       )}
 
