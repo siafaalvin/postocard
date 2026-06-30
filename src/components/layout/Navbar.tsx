@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ViewCounter } from "@/components/layout/ViewCounter";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";

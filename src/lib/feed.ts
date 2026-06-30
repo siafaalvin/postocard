@@ -23,8 +23,10 @@ export interface FeedCapacity {
  * totalCap = baseTierCap + SUM(postsGranted − usedCount) for active non-expired extensions.
  */
 export async function getFeedCapacity(userId: string, tier: string): Promise<FeedCapacity> {
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
+  // Reset at midnight EST (UTC-5)
+  const now = new Date();
+  const est = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const today = new Date(Date.UTC(est.getFullYear(), est.getMonth(), est.getDate()));
 
   const [dailyCount, extensions] = await Promise.all([
     prisma.feedDailyCount.findUnique({
@@ -64,8 +66,10 @@ export async function getFeedCapacity(userId: string, tier: string): Promise<Fee
  * Increment the daily post-view count for a user, consuming extension slots FIFO.
  */
 export async function incrementFeedCount(userId: string, count: number): Promise<void> {
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
+  // Reset at midnight EST (UTC-5)
+  const now = new Date();
+  const est = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const today = new Date(Date.UTC(est.getFullYear(), est.getMonth(), est.getDate()));
 
   await prisma.feedDailyCount.upsert({
     where: { userId_date: { userId, date: today } },
