@@ -40,7 +40,7 @@ export default function LandscapeFeedPage() {
   useEffect(() => {
     fetch("/api/posts?limit=50")
       .then(r => r.json())
-      .then(d => { if (Array.isArray(d)) setPosts(d); })
+      .then(d => { if (Array.isArray(d)) setPosts(d); else if (d?.posts) setPosts(d.posts); else if (Array.isArray(d?.data)) setPosts(d.data); })
       .catch(() => {});
   }, []);
 

@@ -43,7 +43,7 @@ export function MainFeed({ userId, initialCapacity }: Props) {
       const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0;
       const isLandscape = window.innerWidth > window.innerHeight;
       if (isMobile && isLandscape && window.innerWidth < 1200) {
-        router.replace("/feed/landscape");
+        router.replace("/landscape");
       }
     }
     window.addEventListener("orientationchange", () => setTimeout(checkOrientation, 200));
