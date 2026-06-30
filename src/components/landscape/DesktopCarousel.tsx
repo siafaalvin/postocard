@@ -84,49 +84,62 @@ export function DesktopCarousel({ posts, onClose }: Props) {
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
     >
-      {/* Dual view: content left, comments right */}
-      <div
-        className="w-full h-full flex transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
-        style={{ transform: `translateX(${dragX * 0.5}px)` }}
-      >
-        {/* Left panel: post content + avatar bottom-right */}
-        <div className="w-1/2 h-full relative bg-neutral-900 overflow-hidden">
-          {post.type === "image" && mediaSrc ? (
-            <img src={mediaSrc} alt="" className="w-full h-full object-cover" draggable={false} />
-          ) : post.type === "video" && mediaSrc ? (
-            <video src={mediaSrc} className="w-full h-full object-cover" autoPlay muted loop playsInline />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center p-12 bg-[var(--background)]">
-              <p className="text-3xl font-medium text-[var(--foreground)] text-center leading-relaxed">{post.caption}</p>
-            </div>
-          )}
-          {/* Caption overlay on media */}
-          {post.caption && post.type !== "status" && (
-            <div className="absolute bottom-16 left-0 right-0 p-6 bg-gradient-to-t from-black/70 to-transparent">
-              <p className="text-white text-sm leading-relaxed line-clamp-3">{post.caption}</p>
-            </div>
-          )}
-          {/* Avatar bottom-right */}
-          <div className="absolute bottom-4 right-4 flex items-center gap-2">
-            <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur border border-white/30 flex items-center justify-center">
-              <span className="text-white font-bold text-xs">{post.author.username.charAt(0).toUpperCase()}</span>
-            </div>
-            <span className="text-white text-xs font-medium drop-shadow">{post.author.username}</span>
-          </div>
+      {/* Left half: sliding strip of posts */}
+      <div className="w-1/2 h-full relative overflow-hidden">
+        <div
+          className="h-full flex will-change-transform"
+          style={{
+            width: `${posts.length * 100}%`,
+            transform: `translateX(calc(${-index * (100 / posts.length)}% + ${dragX * 0.5}px))`,
+            transition: dragging ? "none" : "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        >
+          {posts.map((p, i) => {
+            const src = p.signedUrl || (p.mediaKey ? `/api/media/${p.mediaKey}` : null);
+            const darkBgs = ["#403F3A", "#4B4A44", "#56544E", "#2B2A27"];
+            const lightBgs = ["#D7CEC1", "#DFD8CE", "#E7E2DA", "#EAE6DF"];
+            const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+            const bgs = isDark ? darkBgs : lightBgs;
+            const bg = (p.type === "image" || p.type === "video") && src ? "#000" : bgs[i % bgs.length];
+            return (
+              <div key={p.id} className="h-full flex-shrink-0 relative flex items-center justify-center" style={{ width: `${100 / posts.length}%`, backgroundColor: bg }}>
+                {p.type === "image" && src ? (
+                  <img src={src} alt="" className="w-full h-full object-cover" draggable={false} />
+                ) : p.type === "video" && src ? (
+                  <video src={src} className="w-full h-full object-cover" autoPlay={i === index} muted loop playsInline />
+                ) : (
+                  <p className={`text-3xl font-medium text-center leading-relaxed px-12 ${isDark ? "text-white" : "text-neutral-900"}`}>{p.caption}</p>
+                )}
+                {/* Caption overlay on media */}
+                {p.caption && p.type !== "status" && (p.type === "image" || p.type === "video") && (
+                  <div className="absolute bottom-16 left-0 right-0 p-6 bg-gradient-to-t from-black/70 to-transparent">
+                    <p className="text-white text-sm leading-relaxed line-clamp-3">{p.caption}</p>
+                  </div>
+                )}
+                {/* Avatar bottom-right */}
+                <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                  <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur border border-white/30 flex items-center justify-center">
+                    <span className="text-white font-bold text-xs">{p.author.username.charAt(0).toUpperCase()}</span>
+                  </div>
+                  <span className="text-white text-xs font-medium drop-shadow">{p.author.username}</span>
+                </div>
+              </div>
+            );
+          })}
         </div>
+      </div>
 
-        {/* Right panel: comments */}
-        <div className="w-1/2 h-full flex flex-col bg-[var(--background)] border-l border-neutral-200 dark:border-neutral-800">
-          <div className="px-6 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
-            <h3 className="font-semibold text-sm">Comments</h3>
-            <span className="text-xs text-neutral-400">{index + 1} / {posts.length}</span>
-          </div>
-          <div className="flex-1 flex items-center justify-center px-6">
-            <p className="text-neutral-400 text-sm text-center">No comments yet — be the first.</p>
-          </div>
-          <div className="px-4 py-3 border-t border-neutral-200 dark:border-neutral-800">
-            <input placeholder="Add a comment..." className="w-full px-4 py-2.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-sm outline-none placeholder-neutral-400" />
-          </div>
+      {/* Right half: comments panel (static, doesn't slide) */}
+      <div className="w-1/2 h-full flex flex-col bg-[var(--background)] border-l border-neutral-200 dark:border-neutral-800">
+        <div className="px-6 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+          <h3 className="font-semibold text-sm">Comments</h3>
+          <span className="text-xs text-neutral-400">{index + 1} / {posts.length}</span>
+        </div>
+        <div className="flex-1 flex items-center justify-center px-6">
+          <p className="text-neutral-400 text-sm text-center">No comments yet &mdash; be the first.</p>
+        </div>
+        <div className="px-4 py-3 border-t border-neutral-200 dark:border-neutral-800">
+          <input placeholder="Add a comment..." className="w-full px-4 py-2.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-sm outline-none placeholder-neutral-400" onClick={e => e.stopPropagation()} />
         </div>
       </div>
 
