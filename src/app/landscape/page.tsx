@@ -80,23 +80,31 @@ export default function LandscapeFeedPage() {
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* Post content */}
+      {/* Post strip - shows prev/current/next for smooth swipe */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 flex"
         style={{
-          transform: `translateX(${offsetX}px)`,
-          transition: swiping ? "none" : "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+          width: `${posts.length * 100}%`,
+          transform: `translateX(calc(-${index * (100 / posts.length)}% + ${offsetX}px))`,
+          transition: swiping ? "none" : "transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
-        {post.type === "image" && mediaSrc ? (
-          <img src={mediaSrc} alt="" className="w-full h-full object-contain" draggable={false} />
-        ) : post.type === "video" && mediaSrc ? (
-          <video src={mediaSrc} className="w-full h-full object-contain" autoPlay muted loop playsInline />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center p-6">
-            <p className="text-xl text-white text-center leading-relaxed">{post.caption}</p>
-          </div>
-        )}
+        {posts.map((p) => {
+          const src = p.signedUrl || (p.mediaKey ? `/api/media/${p.mediaKey}` : null);
+          return (
+            <div key={p.id} className="h-full flex-shrink-0 flex items-center justify-center" style={{ width: `${100 / posts.length}%` }}>
+              {p.type === "image" && src ? (
+                <img src={src} alt="" className="w-full h-full object-contain" draggable={false} />
+              ) : p.type === "video" && src ? (
+                <video src={src} className="w-full h-full object-contain" autoPlay={false} muted loop playsInline />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center p-6 bg-neutral-900">
+                  <p className="text-xl text-white text-center leading-relaxed max-w-md">{p.caption}</p>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Right overlay on tap */}

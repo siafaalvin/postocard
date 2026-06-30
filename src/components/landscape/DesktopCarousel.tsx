@@ -84,42 +84,49 @@ export function DesktopCarousel({ posts, onClose }: Props) {
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
     >
-      {/* Dual view: media left, text right */}
+      {/* Dual view: content left, comments right */}
       <div
-        className="w-full h-full flex transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
-        style={{ transform: `translateX(${dragX * 0.3}px)` }}
+        className="w-full h-full flex transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        style={{ transform: `translateX(${dragX * 0.5}px)` }}
       >
-        {/* Left panel: media or colored bg */}
-        <div className="w-1/2 h-full flex items-center justify-center bg-neutral-900 overflow-hidden">
+        {/* Left panel: post content + avatar bottom-right */}
+        <div className="w-1/2 h-full relative bg-neutral-900 overflow-hidden">
           {post.type === "image" && mediaSrc ? (
-            <img src={mediaSrc} alt="" className="max-w-full max-h-full object-contain" draggable={false} />
+            <img src={mediaSrc} alt="" className="w-full h-full object-cover" draggable={false} />
           ) : post.type === "video" && mediaSrc ? (
-            <video src={mediaSrc} className="max-w-full max-h-full object-contain" autoPlay muted loop playsInline />
+            <video src={mediaSrc} className="w-full h-full object-cover" autoPlay muted loop playsInline />
           ) : (
-            <div className="p-12 flex items-center justify-center">
-              <p className="text-3xl font-medium text-white text-center leading-relaxed">{post.caption}</p>
+            <div className="w-full h-full flex items-center justify-center p-12 bg-[var(--background)]">
+              <p className="text-3xl font-medium text-[var(--foreground)] text-center leading-relaxed">{post.caption}</p>
             </div>
           )}
+          {/* Caption overlay on media */}
+          {post.caption && post.type !== "status" && (
+            <div className="absolute bottom-16 left-0 right-0 p-6 bg-gradient-to-t from-black/70 to-transparent">
+              <p className="text-white text-sm leading-relaxed line-clamp-3">{post.caption}</p>
+            </div>
+          )}
+          {/* Avatar bottom-right */}
+          <div className="absolute bottom-4 right-4 flex items-center gap-2">
+            <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur border border-white/30 flex items-center justify-center">
+              <span className="text-white font-bold text-xs">{post.author.username.charAt(0).toUpperCase()}</span>
+            </div>
+            <span className="text-white text-xs font-medium drop-shadow">{post.author.username}</span>
+          </div>
         </div>
 
-        {/* Right panel: metadata + text */}
-        <div className="w-1/2 h-full flex flex-col justify-center px-12 bg-[var(--background)]">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-neutral-300 dark:bg-neutral-700 flex items-center justify-center font-bold text-sm">
-              {post.author.username.charAt(0).toUpperCase()}
-            </div>
-            <span className="font-semibold text-sm">{post.author.username}</span>
+        {/* Right panel: comments */}
+        <div className="w-1/2 h-full flex flex-col bg-[var(--background)] border-l border-neutral-200 dark:border-neutral-800">
+          <div className="px-6 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+            <h3 className="font-semibold text-sm">Comments</h3>
+            <span className="text-xs text-neutral-400">{index + 1} / {posts.length}</span>
           </div>
-          {post.caption && post.type !== "status" && (
-            <p className="text-lg leading-relaxed text-[var(--foreground)]">{post.caption}</p>
-          )}
-          {post.type === "status" && (
-            <p className="text-2xl font-medium leading-relaxed text-[var(--foreground)]">{post.caption}</p>
-          )}
-          <div className="flex items-center gap-4 mt-8 text-neutral-500">
-            <span className="flex items-center gap-1"><Heart size={18} /> {post.likeCount}</span>
+          <div className="flex-1 flex items-center justify-center px-6">
+            <p className="text-neutral-400 text-sm text-center">No comments yet — be the first.</p>
           </div>
-          <p className="text-xs text-neutral-400 mt-4">{index + 1} / {posts.length}</p>
+          <div className="px-4 py-3 border-t border-neutral-200 dark:border-neutral-800">
+            <input placeholder="Add a comment..." className="w-full px-4 py-2.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-sm outline-none placeholder-neutral-400" />
+          </div>
         </div>
       </div>
 
