@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { PostCard } from "@/components/feed/PostCard";
-import { useOrientation } from "@/components/landscape/useOrientation";
+import { useRouter } from "next/navigation";
 import { DesktopCarousel } from "@/components/landscape/DesktopCarousel";
-import { MobileCarousel } from "@/components/landscape/MobileCarousel";
 import { cn } from "@/lib/utils";
 import type { FeedCapacity } from "@/lib/feed";
 
@@ -35,10 +34,28 @@ interface Props {
 
 export function MainFeed({ userId, initialCapacity }: Props) {
   const [filter, setFilter] = useState<Filter>("all");
-  const isLandscape = useOrientation();
   const [carouselMode, setCarouselMode] = useState(false);
-  const showCarousel = isLandscape || carouselMode;
-    const [posts, setPosts] = useState<Post[]>([]);
+    const router = useRouter();
+
+  // Redirect to landscape page on mobile orientation change
+  useEffect(() => {
+    function checkOrientation() {
+      const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      const isLandscape = window.innerWidth > window.innerHeight;
+      if (isMobile && isLandscape && window.innerWidth < 1200) {
+        router.replace("/feed/landscape");
+      }
+    }
+    window.addEventListener("orientationchange", () => setTimeout(checkOrientation, 200));
+    window.addEventListener("resize", checkOrientation);
+    checkOrientation(); // check on mount
+    return () => {
+      window.removeEventListener("orientationchange", checkOrientation);
+      window.removeEventListener("resize", checkOrientation);
+    };
+  }, [router]);
+
+  const [posts, setPosts] = useState<Post[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -119,7 +136,7 @@ export function MainFeed({ userId, initialCapacity }: Props) {
         </p>
       )}
 
-      {!isLandscape && (
+      {(
         <button
           onClick={() => setCarouselMode(!carouselMode)}
           className="hidden md:flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 dark:hover:text-white mb-3 px-2 py-1 rounded-md border border-neutral-200 dark:border-neutral-700"
@@ -129,16 +146,12 @@ export function MainFeed({ userId, initialCapacity }: Props) {
       )}
 
       {/* Desktop carousel overlay */}
-      {carouselMode && !isLandscape && posts.length > 0 && (
+      {carouselMode && posts.length > 0 && (
         <DesktopCarousel posts={posts} onClose={() => setCarouselMode(false)} />
       )}
 
-      {/* Mobile landscape full-screen takeover */}
-      {isLandscape && posts.length > 0 && (
-        <MobileCarousel posts={posts} />
-      )}
 
-      {!carouselMode && !isLandscape && posts.map((post) => (
+      {!carouselMode && posts.map((post) => (
         <PostCard key={post.id} post={post} viewerId={userId} />
       ))}
 
