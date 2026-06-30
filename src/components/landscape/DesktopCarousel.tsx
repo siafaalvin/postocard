@@ -1,4 +1,5 @@
 "use client";
+import { createPortal } from "react-dom";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { X, Heart, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -74,10 +75,10 @@ export function DesktopCarousel({ posts, onClose }: Props) {
 
   if (!post) return null;
 
-  return (
+  const content = (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[100] bg-black cursor-grab active:cursor-grabbing select-none"
+      className="fixed top-[60px] left-0 right-0 bottom-0 z-[100] bg-black cursor-grab active:cursor-grabbing select-none"
       onMouseMove={onMouseMove}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -143,4 +144,7 @@ export function DesktopCarousel({ posts, onClose }: Props) {
       </div>
     </div>
   );
+
+  if (typeof window === "undefined") return content;
+  return createPortal(content, document.body);
 }
