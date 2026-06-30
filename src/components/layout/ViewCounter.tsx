@@ -1,10 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Eye } from "lucide-react";
 import Link from "next/link";
 
 export function ViewCounter() {
   const [remaining, setRemaining] = useState<number | null>(null);
+  const [animating, setAnimating] = useState(false);
+  const prevRemaining = useRef<number | null>(null);
   const [total, setTotal] = useState<number | null>(null);
   const [atCap, setAtCap] = useState(false);
 
@@ -14,6 +16,11 @@ export function ViewCounter() {
         const res = await fetch("/api/feed/remaining");
         if (res.ok) {
           const data = await res.json();
+          if (prevRemaining.current !== null && data.remaining !== prevRemaining.current) {
+            setAnimating(true);
+            setTimeout(() => setAnimating(false), 600);
+          }
+          prevRemaining.current = data.remaining;
           setRemaining(data.remaining);
           setTotal(data.total);
           setAtCap(data.atCap);
@@ -56,7 +63,7 @@ export function ViewCounter() {
   // Counter badge above FAB
   return (
     <>
-      <button onClick={() => setShowUpgrade(true)} className={"fixed bottom-24 right-5 z-[60] flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 shadow-md text-xs font-medium " + color} title={`${remaining} of ${total} views remaining`}>
+      <button onClick={() => setShowUpgrade(true)} className={"fixed bottom-24 right-5 z-[60] flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 shadow-md text-xs font-medium transition-all duration-300 " + color + (animating ? " scale-125 animate-wiggle" : "")} title={`${remaining} of ${total} views remaining`}>
         <Eye size={12} />
         <span>{remaining}</span>
       </button>

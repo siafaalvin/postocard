@@ -38,7 +38,7 @@ export default function LandscapeFeedPage() {
 
   // Fetch posts
   useEffect(() => {
-    fetch("/api/posts?limit=50")
+    fetch("/api/posts?limit=50&skipCount=true")
       .then(r => r.json())
       .then(d => { if (Array.isArray(d)) setPosts(d); else if (d?.posts) setPosts(d.posts); else if (Array.isArray(d?.data)) setPosts(d.data); })
       .catch(() => {});
@@ -85,7 +85,7 @@ export default function LandscapeFeedPage() {
         className="absolute inset-0"
         style={{
           transform: `translateX(${offsetX}px)`,
-          transition: swiping ? "none" : "transform 0.25s ease-out",
+          transition: swiping ? "none" : "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
         {post.type === "image" && mediaSrc ? (

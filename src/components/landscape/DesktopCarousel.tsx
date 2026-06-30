@@ -86,7 +86,7 @@ export function DesktopCarousel({ posts, onClose }: Props) {
     >
       {/* Dual view: media left, text right */}
       <div
-        className="w-full h-full flex transition-transform duration-200 ease-out"
+        className="w-full h-full flex transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
         style={{ transform: `translateX(${dragX * 0.3}px)` }}
       >
         {/* Left panel: media or colored bg */}
