@@ -25,6 +25,8 @@ export function ViewCounter() {
     return () => clearInterval(interval);
   }, []);
 
+  const [showUpgrade, setShowUpgrade] = useState(false);
+
   if (remaining === null && !atCap) return null;
 
   const pct = total ? Math.round(((remaining ?? 0) / total) * 100) : 100;
@@ -50,8 +52,6 @@ export function ViewCounter() {
       </div>
     );
   }
-
-  const [showUpgrade, setShowUpgrade] = useState(false);
 
   // Counter badge above FAB
   return (
