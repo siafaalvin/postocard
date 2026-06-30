@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getFeedCapacity, incrementFeedCount } from "@/lib/feed";
-import type { NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
