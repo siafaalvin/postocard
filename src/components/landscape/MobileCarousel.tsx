@@ -65,10 +65,10 @@ export function MobileCarousel({ posts }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-[200] bg-black overflow-hidden" onClick={handleTap}>
+    <div className="fixed inset-0 z-[200] bg-black overflow-hidden touch-none" onClick={handleTap}>
       {/* Post content - horizontal swipe */}
       <div
-        className="w-full h-full"
+        className="w-full h-full absolute inset-0"
         style={{
           transform: `translateX(${offsetX}px)`,
           transition: swiping ? "none" : "transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)",
